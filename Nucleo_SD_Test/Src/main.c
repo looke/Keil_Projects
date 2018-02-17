@@ -96,7 +96,7 @@ uint32_t errorstate;
 
 #define BLOCK_SIZE            512 /* Block Size in Bytes */
 __align(8) uint8_t aBuffer_Block_Rx[512*60];
-__align(8) uint8_t aBuffer_Block_Tx[512];
+__align(8) uint8_t aBuffer_Block_Tx[512*60];
 //uint8_t aBuffer_Block_Rx[BLOCK_SIZE];
 //uint8_t aBuffer_Block_Tx[BLOCK_SIZE];
 /* Prescaler declaration */
@@ -106,8 +106,9 @@ __IO uint32_t uwPrescalerValue = 0;
 void SystemClock_Config(void);
 static void Error_Handler(void);
 static void CPU_CACHE_Enable(void);
-/* Private functions ---------------------------------------------------------*/
 
+/* Private functions ---------------------------------------------------------*/
+void DelaySomeTime(void);
 /**
   * @brief  Main program
   * @param  None
@@ -195,13 +196,27 @@ int main(void)
 	//Config DMA Channel
 	hdma_sdmmc.Instance = DMA2_Stream3;
 	hdma_sdmmc.Init.Channel = DMA_CHANNEL_4;
-	hdma_sdmmc.Init.Direction = DMA_PERIPH_TO_MEMORY;
+	
+	//DMA read process DMA_PERIPH_TO_MEMORY
+	//hdma_sdmmc.Init.Direction = DMA_PERIPH_TO_MEMORY;
+	
+	//DMA write process DMA_MEMORY_TO_PERIPH
+	hdma_sdmmc.Init.Direction = DMA_MEMORY_TO_PERIPH;
+	
   hdma_sdmmc.Init.PeriphInc = DMA_PINC_DISABLE;
   hdma_sdmmc.Init.MemInc = DMA_MINC_ENABLE;
   hdma_sdmmc.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-  hdma_sdmmc.Init.MemDataAlignment = DMA_PDATAALIGN_WORD;
-	hdma_sdmmc.Init.Mode = DMA_SxCR_PFCTRL;
+  hdma_sdmmc.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+	
+	//DMA read process must use DMA_SxCR_PFCTRL
+	//hdma_sdmmc.Init.Mode = DMA_SxCR_PFCTRL;
+	
+	//DMA write process must use DMA_NORMAL
+	hdma_sdmmc.Init.Mode = DMA_NORMAL;
+	
+	
   hdma_sdmmc.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+	
 	hdma_sdmmc.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
 	hdma_sdmmc.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
 	hdma_sdmmc.Init.MemBurst = DMA_MBURST_INC4;
@@ -212,8 +227,8 @@ int main(void)
     Error_Handler();
   }
 		
-	__HAL_LINKDMA(&SDHandle_SDMMC1,hdmarx,hdma_sdmmc);
-	//__HAL_LINKDMA(&SDHandle_SDMMC1,hdmatx,hdma_sdmmc);
+	//__HAL_LINKDMA(&SDHandle_SDMMC1,hdmarx,hdma_sdmmc);
+	__HAL_LINKDMA(&SDHandle_SDMMC1,hdmatx,hdma_sdmmc);
 
 	/* DMA interrupt init */
   /* DMA2_Channel4_5_IRQn interrupt configuration */
@@ -221,10 +236,22 @@ int main(void)
   HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 	
 
-	if(HAL_SD_ReadBlocks_DMA(&SDHandle_SDMMC1, aBuffer_Block_Rx, 0x01, 0x02) == HAL_OK)
+	//if(HAL_SD_ReadBlocks_DMA(&SDHandle_SDMMC1, aBuffer_Block_Rx, 0x00, 1) == HAL_OK)
+	//{
+	//  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
+	//}
+	
+	if(HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC1, aBuffer_Block_Tx, 0x00, 60) != HAL_OK)
 	{
-	  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
+	  //SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
+		Error_Handler();
 	}
+	
+  //if (HAL_SD_WriteBlocks(&SDHandle_SDMMC1, aBuffer_Block_Tx, 0x01, 0x01, 0x0F) != HAL_OK)
+  //{
+	//	Error_Handler();
+	//}
+	
 	/*
 	if (HAL_SD_GetCardInfo(&SDHandle_SDMMC1, &SDCardInfo) != HAL_OK)
 	{
@@ -242,7 +269,7 @@ int main(void)
 	}
 	*/
 	
-	SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
+	//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
 	/* USER CODE BEGIN 2 */
 
 	//int16_t i = 0;
@@ -253,18 +280,17 @@ int main(void)
 	
   while (1)
   {
-		SDState = HAL_SD_GetState(&SDHandle_SDMMC1);
-		SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
+		//SDState = HAL_SD_GetState(&SDHandle_SDMMC1);
+		//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
 		
 		//if (HAL_SD_ReadBlocks(&SDHandle_SDMMC1, aBuffer_Block_Rx, 0x02, 0x01, 0x0F) != HAL_OK)
 		//{
 		//	Error_Handler();
 	  //}
 		
-		//if (HAL_SD_WriteBlocks(&SDHandle_SDMMC1, aBuffer_Block_Tx, 0x02, 0x01, 0x0F) != HAL_OK)
-		//{
-		//	Error_Handler();
-	  //}
+
+		BSP_LED_Toggle(LED3);
+		DelaySomeTime();
   }
 }
 
@@ -362,6 +388,18 @@ static void CPU_CACHE_Enable(void)
 void HAL_SD_ErrorCallback(SD_HandleTypeDef *hsd)
 {
 	uint32_t error = hsd->hdmarx->ErrorCode;
+}
+
+
+void DelaySomeTime(void)
+{
+   uint16_t i=0;
+	 uint16_t time=0xFFFF;
+   while(time--)
+   {
+      i=0xFF;
+      while(i--);    
+   }
 }
 
 #ifdef  USE_FULL_ASSERT

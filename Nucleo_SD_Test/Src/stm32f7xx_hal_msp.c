@@ -134,7 +134,7 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim)
   /* Set the TIMx priority */
   //HAL_NVIC_SetPriority(TIMx_Master_IRQn, 3, 0);
 	//HAL_NVIC_SetPriority(TIMx_Slave_IRQn, 3, 0);
-	HAL_NVIC_SetPriority(TIMx_32bits_IRQn, 3, 0);
+	HAL_NVIC_SetPriority(TIMx_32bits_IRQn, 4, 0);
 	/* Enable the TIMx global Interrupt */
   //HAL_NVIC_EnableIRQ(TIMx_Master_IRQn);
   //HAL_NVIC_EnableIRQ(TIMx_Slave_IRQn);
