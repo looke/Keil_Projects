@@ -55,3 +55,5 @@ dkms.conf
 *.htm
 *.iex
 *.sct
+*.axf
+*.dep
