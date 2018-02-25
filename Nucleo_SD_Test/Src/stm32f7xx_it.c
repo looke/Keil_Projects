@@ -58,7 +58,7 @@
 //extern TIM_HandleTypeDef    TimHandle_Slave;
 //extern TIM_HandleTypeDef    TimHandle_32bits;
 
-extern SD_HandleTypeDef    SDHandle_SDMMC1;
+extern SD_HandleTypeDef    SDHandle_SDMMC;
 extern DMA_HandleTypeDef    hdma_sdmmc;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -209,13 +209,23 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
-void SDMMC1_IRQHandler(void)
+//void SDMMC1_IRQHandler(void)
+//{
+//  HAL_SD_IRQHandler(&SDHandle_SDMMC);
+//}
+
+/**
+  * @brief  This function handles SDMMC2 interrupt request.
+  * @param  None
+  * @retval None
+  */
+void SDMMC2_IRQHandler(void)
 {
-  HAL_SD_IRQHandler(&SDHandle_SDMMC1);
+  HAL_SD_IRQHandler(&SDHandle_SDMMC);
 }
 
 
-void DMA2_Stream3_IRQHandler(void)
+void DMA2_Stream5_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(&hdma_sdmmc);
 }

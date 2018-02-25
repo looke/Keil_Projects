@@ -50,56 +50,68 @@
 /* User can use this section to tailor TIMx instance used and associated
    resources */
 /* Definition for TIMx clock resources */
-#define TIMx_Master                    TIM3
-#define TIMx_Master_CLK_ENABLE()       __HAL_RCC_TIM3_CLK_ENABLE()
+//#define TIMx_Master                    TIM3
+//#define TIMx_Master_CLK_ENABLE()       __HAL_RCC_TIM3_CLK_ENABLE()
 
-#define TIMx_Slave                     TIM4
-#define TIMx_Slave_CLK_ENABLE()        __HAL_RCC_TIM4_CLK_ENABLE()
+//#define TIMx_Slave                     TIM4
+//#define TIMx_Slave_CLK_ENABLE()        __HAL_RCC_TIM4_CLK_ENABLE()
 
 #define TIMx_32bits                    TIM2
 #define TIMx_32bits_CLK_ENABLE()       __HAL_RCC_TIM2_CLK_ENABLE()
 
 /* Definition for SD Card clock resources */
 #define SD1_CLK_ENABLE()							 __HAL_RCC_SDMMC1_CLK_ENABLE()
-
+#define SD2_CLK_ENABLE()							 __HAL_RCC_SDMMC2_CLK_ENABLE()
 
 /* Definition for TIMx's NVIC */
-#define TIMx_Master_IRQn               TIM3_IRQn
-#define TIMx_Master_IRQHandler         TIM3_IRQHandler
+//#define TIMx_Master_IRQn               TIM3_IRQn
+//#define TIMx_Master_IRQHandler         TIM3_IRQHandler
 
-#define TIMx_Slave_IRQn                TIM4_IRQn
-#define TIMx_Slave_IRQHandler          TIM4_IRQHandler
+//#define TIMx_Slave_IRQn                TIM4_IRQn
+//#define TIMx_Slave_IRQHandler          TIM4_IRQHandler
 
 #define TIMx_32bits_IRQn               TIM2_IRQn
 #define TIMx_32bits_IRQHandler         TIM2_IRQHandler
 
 
-#define TIMx_Master_CHANNEL_GPIO_PORT() __GPIOB_CLK_ENABLE()
+//#define TIMx_Master_CHANNEL_GPIO_PORT() __GPIOB_CLK_ENABLE()
 #define TIMx_32bits_CHANNEL_GPIO_PORT() __GPIOA_CLK_ENABLE()
 
 #define SDMMC1_GEN_GPIO_PORT()          __GPIOC_CLK_ENABLE()
 #define SDMMC1_CMD_GPIO_PORT()          __GPIOD_CLK_ENABLE()
 
+#define SDMMC2_GEN_GPIO_D0_D4_PORT()    __GPIOB_CLK_ENABLE()
+#define SDMMC2_CMD_GPIO_PORT()          __GPIOD_CLK_ENABLE()
 
-#define GPIO_PIN_TIMx_Master_CHANNEL_1      GPIO_PIN_4
-#define GPIO_PIN_TIMx_Slave_CHANNEL_1       GPIO_PIN_6
+//#define GPIO_PIN_TIMx_Master_CHANNEL_1      GPIO_PIN_4
+//#define GPIO_PIN_TIMx_Slave_CHANNEL_1       GPIO_PIN_6
 
 #define GPIO_PIN_TIMx_32bits_CHANNEL_1       GPIO_PIN_5
 
-#define GPIO_AF_TIMx_Master            GPIO_AF2_TIM3
-#define GPIO_AF_TIMx_Slave             GPIO_AF2_TIM4
+//#define GPIO_AF_TIMx_Master            GPIO_AF2_TIM3
+//#define GPIO_AF_TIMx_Slave             GPIO_AF2_TIM4
 
 #define GPIO_AF_TIMx_32bits            GPIO_AF1_TIM2
 
 #define GPIO_AF_SDMMC1								 GPIO_AF12_SDMMC1
 
-#define SDMMC1_D0            GPIO_PIN_8
-#define SDMMC1_D1            GPIO_PIN_9
-#define SDMMC1_D2            GPIO_PIN_10
-#define SDMMC1_D3            GPIO_PIN_11
-#define SDMMC1_CK            GPIO_PIN_12
+#define GPIO_AF_SDMMC2_GEN						 GPIO_AF10_SDMMC2
+#define GPIO_AF_SDMMC2_CMD						 GPIO_AF11_SDMMC2
 
-#define SDMMC1_CMD           GPIO_PIN_2
+#define SDMMC1_D0            GPIO_PIN_8   //PC8
+#define SDMMC1_D1            GPIO_PIN_9   //PC9
+#define SDMMC1_D2            GPIO_PIN_10  //PC10
+#define SDMMC1_D3            GPIO_PIN_11  //PC11
+#define SDMMC1_CK            GPIO_PIN_12  //PC12
+#define SDMMC1_CMD           GPIO_PIN_2   //PD2
+
+#define SDMMC2_D0            GPIO_PIN_14	//PB14
+#define SDMMC2_D1            GPIO_PIN_15  //PB15
+#define SDMMC2_D2            GPIO_PIN_3   //PB3
+#define SDMMC2_D3            GPIO_PIN_4   //PB4
+#define SDMMC2_CK            GPIO_PIN_6   //PD6
+#define SDMMC2_CMD           GPIO_PIN_7   //PD7
+
 
 #define TEST_LIMIT 						600
 
