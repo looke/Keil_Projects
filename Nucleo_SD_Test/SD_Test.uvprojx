@@ -392,6 +392,11 @@
               <FileType>5</FileType>
               <FilePath>.\Inc\stm32f7xx_it.h</FilePath>
             </File>
+            <File>
+              <FileName>looke_fileFormat_SD.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inc\looke_fileFormat_SD.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
