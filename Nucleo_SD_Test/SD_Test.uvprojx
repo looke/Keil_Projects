@@ -427,6 +427,11 @@
               <FileType>1</FileType>
               <FilePath>.\Src\stm32f7xx_it.c</FilePath>
             </File>
+            <File>
+              <FileName>looke_fileFormat_SD.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\looke_fileFormat_SD.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

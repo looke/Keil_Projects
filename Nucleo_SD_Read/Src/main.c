@@ -260,7 +260,7 @@ int main(void)
 	
 	SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 	
-	if (HAL_SD_ReadBlocks(&SDHandle_SDMMC, aBuffer_Block_Rx2, 0x1B, 1, 0xFFF) != HAL_OK)
+	if (HAL_SD_ReadBlocks(&SDHandle_SDMMC, aBuffer_Block_Rx2, 0x00, 1, 0xFFF) != HAL_OK)
 	{
 		Error_Handler();
 	}

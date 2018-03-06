@@ -39,6 +39,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+
 /** @addtogroup STM32F7xx_HAL_Examples
   * @{
   */
@@ -95,12 +96,19 @@ uint32_t errorstate;
 //uint32_t testArray_Period[TEST_LIMIT];
 //int testArray_Period_Diff[TEST_LIMIT];
 
-#define BLOCK_SIZE            512 /* Block Size in Bytes */
-#define CACHE_SIZE            30 /* Block Size in Bytes */
+
 
 __align(4) uint8_t align[16];
-//__align(4) uint8_t aBuffer_Block_Rx[BLOCK_SIZE*CACHE_SIZE];
-__align(4) uint8_t aBuffer_Block_Tx[BLOCK_SIZE*CACHE_SIZE];
+__align(4) uint8_t aBuffer_Block_Rx[LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE];
+//__align(4) uint8_t aBuffer_Block_Tx[BLOCK_SIZE*CACHE_SIZE];
+
+__align(4) LOOKE_SD_FileSys_Para_Union SD_FileSysParaUnion;
+
+//LOOKE_SD_FileSys_Para FileSysPara;
+//LOOKE_SD_MeasureSection_Para MeasureSectionPara;
+//LOOKE_SD_TimeBase_Data_Block TimeBaseDataBlock;
+//LOOKE_SD_ARHS_Data_Block AHRSDataBlock;
+
 //__align(4) uint8_t aBuffer_Block_Tx_Write[BLOCK_SIZE];
 //uint8_t aBuffer_Block_Rx[BLOCK_SIZE];
 //uint8_t aBuffer_Block_Tx[BLOCK_SIZE];
@@ -110,6 +118,8 @@ __IO uint32_t uwPrescalerValue = 0;
 uint32_t startTimeStamp;
 uint32_t endTimeStamp;
 uint32_t timeEclipse;
+
+uint32_t sizeTest;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void Error_Handler(void);
@@ -138,7 +148,21 @@ int main(void)
        - Low Level Initialization
      */
   HAL_Init();
-
+	sizeTest = sizeof(LOOKE_SD_FileSys_Para);
+	sizeTest = sizeof(LOOKE_SD_MeasureSection_Para);
+	sizeTest = sizeof(LOOKE_SD_TimeBase_Data_Block);
+	sizeTest = sizeof(LOOKE_SD_ARHS_Data_Block);
+	
+	sizeTest = sizeof(LOOKE_SD_FileSys_Para_Union);
+	sizeTest = sizeof(LOOKE_SD_MeasureSection_Para_Union);
+	
+	sizeTest = sizeof(LOOKE_SD_TimeBase_Data_Buffer_Union);
+	sizeTest = sizeof(LOOKE_SD_ARHS_Data_Buffer_Union);
+	
+  sizeTest = sizeof(LOOKE_SD_ARHS_Data_Cache);
+	sizeTest = sizeof(LOOKE_SD_TimeBase_Data_Cache);
+	
+	
   /* Configure the system clock to 216 MHz */
   SystemClock_Config();
 
@@ -176,7 +200,7 @@ int main(void)
   SDHandle_SDMMC.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
   SDHandle_SDMMC.Init.BusWide = SDMMC_BUS_WIDE_1B;
 	SDHandle_SDMMC.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
-  SDHandle_SDMMC.Init.ClockDiv = 2; //12Mhz
+  SDHandle_SDMMC.Init.ClockDiv = 0; //24Mhz
   
 	if (HAL_SD_Init(&SDHandle_SDMMC) != HAL_OK)
   {
@@ -266,15 +290,24 @@ int main(void)
   HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
 	
 
+	
+	//SD_FileSysParaUnion.FileSysPara.NumberOfMeasurementSection = 1;
+	//SD_FileSysParaUnion.FileSysPara.SectionIndexArray[0].SectionStartBlock = 1;
+	//SD_FileSysParaUnion.FileSysPara.SectionIndexArray[0].SectionEndBlock = 1;
+	
+  //LOOKE_SD_File_WriteSysPara(&SDHandle_SDMMC, SD_FileSysParaUnion.DataArray);
+	LOOKE_SD_File_ReadSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion);
+	
 	//if(HAL_SD_ReadBlocks_DMA(&SDHandle_SDMMC1, aBuffer_Block_Rx, 0x00, 1) == HAL_OK)
 	//{
 	//  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
 	//}
 	
+	/*
 	uint16_t initForBuffer;
 	for(initForBuffer = 0 ; initForBuffer<BLOCK_SIZE*CACHE_SIZE; initForBuffer++)
 	{
-		aBuffer_Block_Tx[initForBuffer] = 0x79;
+		aBuffer_Block_Tx[initForBuffer] = 0x77;
 	}
 	
 	SCB_CleanDCache();
@@ -289,6 +322,9 @@ int main(void)
 	
 	SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 	SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
+	*/
+	
+	
 	/*
 	uint16_t initForBuffer;
 	for(initForBuffer = 0 ; initForBuffer<BLOCK_SIZE; initForBuffer++)

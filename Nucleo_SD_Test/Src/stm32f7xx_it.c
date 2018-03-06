@@ -59,7 +59,8 @@
 //extern TIM_HandleTypeDef    TimHandle_32bits;
 
 extern SD_HandleTypeDef    SDHandle_SDMMC;
-extern DMA_HandleTypeDef    hdma_sdmmc;
+extern DMA_HandleTypeDef   hdma_sdmmc;
+
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
