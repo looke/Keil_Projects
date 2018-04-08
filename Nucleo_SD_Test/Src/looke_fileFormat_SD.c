@@ -142,6 +142,59 @@ HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOK
 	}
 	return HAL_OK;
 };
+
+/**
+  * @brief  ARHS cache write to SD Card.
+  * @param  hsd: Pointer to the SD handle
+  * @retval LOOKE_SD_FILE_TRANSFER_RESULT
+  */
+LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_ARHS_Data_Cache *pCache)
+{
+	LOOKE_SD_ARHS_Data_Buffer_Union *pBufferUnion;
+	uint8_t currentBlockIndex;
+  
+	// Find Cache Buffer currently in use
+  // The one that not in use should be sync to SD card
+	if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
+	{
+		pBufferUnion = &(pCache->ARHS_DataBuffer_Slave);
+	}
+	else
+	{
+		pBufferUnion = &(pCache->ARHS_DataBuffer_Master);
+	}
+	
+	//Find the end Block of Current Measure Section
+	//Then increase one step for new block.
+	currentBlockIndex = 1 + pFileSysPara->SectionIndexArray[pFileSysPara->NumberOfMeasurementSection - 1].SectionEndBlock;
+	
+	if(currentBlockIndex+LOOKE_SD_FILE_CACHE_SIZE >= hsd->SdCard.BlockNbr)
+	{
+	  return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDCAPACITY;
+	}
+	
+	//Check SD Card State
+  if(HAL_SD_GetCardState(hsd) != HAL_SD_CARD_TRANSFER)
+	{
+		return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDBUSY;
+	}
+	
+	//Start DMA Write Transfer
+	if (HAL_SD_WriteBlocks_DMA(hsd, pBufferUnion->DataArray, currentBlockIndex, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK)
+	{
+		return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_DMA;
+	}
+	
+	return LOOKE_SD_FILE_SYNC_TRANSFER_OK;
+	
+	
+	/////////////////////////////////////////////////////////////////////
+	//
+	// Buffer State Should be Changed in DMA Transfer Complete Interrupt
+	//
+	/////////////////////////////////////////////////////////////////////
+	
+};
 /**
   * @}
   */

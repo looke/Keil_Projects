@@ -70,7 +70,7 @@ typedef struct
   */ 
 typedef struct
 {
-	//LOOKE_SD_FILE_MeasureSection_State MeasureSectionState;             /*!< Specifies the State of the Measurement Section.    */
+	//LOOKE_SD_FILE_MeasureSection_State MeasureSectionState;           /*!< Specifies the State of the Measurement Section.    */
 	
   uint32_t NumberOfTimeBaseDataBlock;                     						/*!< Specifies the Number of Time Base Data Block in this Measurement Section    */
 	
@@ -223,8 +223,9 @@ typedef union
 
 typedef enum
 {
-  LOOKE_SD_FILE_BUFFER_NOT_FULL     = ((uint32_t)0x00000000U),    /*!< Data Buffer is not full          */
-	LOOKE_SD_FILE_BUFFER_FULL         = ((uint32_t)0x00000001U),    /*!< Data Buffer is full              */
+  LOOKE_SD_FILE_BUFFER_NOT_FULL     = ((uint32_t)0x00000000U),    /*!< Data Master and Slave Buffer bothh are not full   */
+	LOOKE_SD_FILE_BUFFER_HALF_FULL    = ((uint32_t)0x00000001U),    /*!< Data Master or Slave Buffer is full               */
+	LOOKE_SD_FILE_BUFFER_FULL         = ((uint32_t)0x00000002U),    /*!< Data Master and Slave Buffer are all full         */
 }LOOKE_SD_FILE_Buffer_State;
 
 typedef enum
@@ -244,9 +245,9 @@ typedef struct
 	
   uint32_t CurrentMeasureIndex;
 	
-	LOOKE_SD_FILE_Buffer_Current CurrentDataBuffer;              /*!< Specifies the Data Buffer currently in use      */
+	LOOKE_SD_FILE_Buffer_Current CurrentDataBuffer;              /*!< Specifies the Data Buffer currently in use Master or Slave     */
 	
-	LOOKE_SD_FILE_Buffer_State CacheBufferState;                 /*!< Specifies the Data Buffer State                 */
+	LOOKE_SD_FILE_Buffer_State CacheBufferState;                 /*!< Specifies the Data Buffer State NOT_FULLL or FULL              */
 	
   LOOKE_SD_ARHS_Data_Buffer_Union ARHS_DataBuffer_Master;      /*!< ARHS Data Buffer Master                         */
 
@@ -262,19 +263,65 @@ typedef struct
 typedef struct
 {
 	
-	uint32_t CurrentBlockIndex;
+	uint32_t CurrentBlockIndex;                                          /*!< Specifies the Block that contains the new data                 */
 	
-  uint32_t CurrentMeasureIndex;
+  uint32_t CurrentMeasureIndex;                                        /*!< Specifies the last data in the block                           */
 	
-	LOOKE_SD_FILE_Buffer_Current CurrentDataBuffer;                      /*!< Specifies the Data Buffer currently in use      */
+	LOOKE_SD_FILE_Buffer_Current CurrentDataBuffer;                      /*!< Specifies the Data Buffer currently in use Master or Slave     */
 	
-	LOOKE_SD_FILE_Buffer_State CacheBufferState;                         /*!< Specifies the Data Buffer State                 */
+	LOOKE_SD_FILE_Buffer_State CacheBufferState;                         /*!< Specifies the Data Buffer State NOT_FULLL or FULL              */
 	
   LOOKE_SD_TimeBase_Data_Buffer_Union TimeBase_DataBuffer_Master;      /*!< Time Base Data Buffer Master                         */
 
   LOOKE_SD_TimeBase_Data_Buffer_Union TimeBase_DataBuffer_Slave;       /*!< Time Base Data Buffer Slave                          */
 
 }LOOKE_SD_TimeBase_Data_Cache;
+
+
+/** @defgroup SD_File_Functions_Group2 cache functions
+  * @{
+  */
+typedef enum
+{
+  LOOKE_SD_FILE_SYNC_TRANSFER_OK     						   = ((uint32_t)0x00000001U),  /*!< Measure Section state is ready          */
+  LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDCAPACITY      = ((uint32_t)0x00000002U),  /*!< Measure Section state is busy           */
+  LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDBUSY          = ((uint32_t)0x00000003U),  /*!< Measure Section state is busy           */
+	LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_DMA             = ((uint32_t)0x00000004U),  /*!< Measure Section state is error          */
+	
+}LOOKE_SD_FILE_SYNC_TRANSFER_RESULT;
+
+LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_ARHS_Data_Cache *pCache);
+
+HAL_StatusTypeDef LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_HandleTypeDef *hsd, LOOKE_SD_TimeBase_Data_Cache *pCahce);
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+/**
+  *
+  *
+  */
+////////////////////////////////////////////////////////////////////////////////////////
+typedef enum
+{
+  LOOKE_SD_FILE_GLOBLE_CACHE_STATE_TRANSFER   = ((uint32_t)0x00000000U),    /*!< Data Buffer is not in Sync Process and ready for Sync          */
+	LOOKE_SD_FILE_GLOBLE_CACHE_STATE_SYNC       = ((uint32_t)0x00000001U),    /*!< Data Buffer is in Sync Process and is writing data to SD Card  */
+	LOOKE_SD_FILE_GLOBLE_CACHE_STATE_STOP       = ((uint32_t)0x00000002U),    /*!< Data Collection is stopped                                     */
+}LOOKE_SD_FILE_GLOBLE_CACHE_STATE;
+
+/** 
+  * @brief  SD Card Global Data Cache Structure definition
+  * 30732*2 Bytes in total
+  */ 
+typedef struct
+{
+	LOOKE_SD_FILE_GLOBLE_CACHE_STATE CurrentState;    /*!< Specifies the Cache State             */
+	
+  LOOKE_SD_TimeBase_Data_Cache TimeBase_Cache;      /*!< Time Base Data Cache                  */
+
+  LOOKE_SD_ARHS_Data_Cache ARHS_Cache;              /*!< ARHS Data Cache                       */
+
+}LOOKE_SD_Global_Data_Cache;
+
 
 #ifdef __cplusplus
 }

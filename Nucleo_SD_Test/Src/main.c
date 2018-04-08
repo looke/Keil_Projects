@@ -99,10 +99,13 @@ uint32_t errorstate;
 
 
 __align(4) uint8_t align[16];
-__align(4) uint8_t aBuffer_Block_Rx[LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE];
+//__align(4) uint8_t aBuffer_Block_Rx[LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE];
 //__align(4) uint8_t aBuffer_Block_Tx[BLOCK_SIZE*CACHE_SIZE];
 
 __align(4) LOOKE_SD_FileSys_Para_Union SD_FileSysParaUnion;
+
+//__align(4) LOOKE_SD_ARHS_Data_Cache ARHS_cache;
+//__align(4) LOOKE_SD_TimeBase_Data_Cache TimeBase_cache;
 
 //LOOKE_SD_FileSys_Para FileSysPara;
 //LOOKE_SD_MeasureSection_Para MeasureSectionPara;
