@@ -54,7 +54,7 @@ dkms.conf
 *.crf
 *.htm
 *.iex
-*.sct
+# *.sct  Compile Must Use sct Files
 *.axf
 *.dep
 *.lnp
