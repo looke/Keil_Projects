@@ -161,7 +161,7 @@ typedef struct
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/**
+/** Union uesd to transfer data
   *
   *
   */
@@ -283,10 +283,10 @@ typedef struct
   */
 typedef enum
 {
-  LOOKE_SD_FILE_SYNC_TRANSFER_OK     						   = ((uint32_t)0x00000001U),  /*!< Measure Section state is ready          */
-  LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDCAPACITY      = ((uint32_t)0x00000002U),  /*!< Measure Section state is busy           */
-  LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDBUSY          = ((uint32_t)0x00000003U),  /*!< Measure Section state is busy           */
-	LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_DMA             = ((uint32_t)0x00000004U),  /*!< Measure Section state is error          */
+  LOOKE_SD_FILE_SYNC_TRANSFER_OK     						    = ((uint32_t)0x00000001U),  /*!< Measure Section state is ready          */
+  LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDFULL          = ((uint32_t)0x00000002U),  /*!< Measure Section state is Error because SD card is Full           */
+  LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDBUSY          = ((uint32_t)0x00000003U),  /*!< Measure Section state is Error because SD card is busy           */
+	LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_DMA             = ((uint32_t)0x00000004U),  /*!< Measure Section state is Error because SD card DMA fail         */
 	
 }LOOKE_SD_FILE_SYNC_TRANSFER_RESULT;
 
