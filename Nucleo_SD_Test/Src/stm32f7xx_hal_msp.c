@@ -70,14 +70,14 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 {
   /*##-1- Enable peripheral clock #################################*/
   /* TIMx Peripheral clock enable */
-  //TIMx_Master_CLK_ENABLE();
   TIMx_32bits_CLK_ENABLE();
+	
   /*##-2- Configure the NVIC for TIMx ########################################*/
   /* Set the TIMx priority */
-  //HAL_NVIC_SetPriority(TIMx_Master_IRQn, 3, 0);
+  HAL_NVIC_SetPriority(TIMx_32bits_IRQn, 3, 0);
 
   /* Enable the TIMx global Interrupt */
-  //HAL_NVIC_EnableIRQ(TIMx_Master_IRQn);
+  HAL_NVIC_EnableIRQ(TIMx_32bits_IRQn);
 }
 
 /**
@@ -92,52 +92,25 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim)
 	GPIO_InitTypeDef GPIO_InitStruct;
   /*##-1- Enable peripheral clock #################################*/
   /* TIMx Peripheral clock enable */
-  //TIMx_Master_CLK_ENABLE();
-	//TIMx_Slave_CLK_ENABLE();
-	
 	TIMx_32bits_CLK_ENABLE();
 	
 	/* TIMx Channel clock enable */
-	//TIMx_Master_CHANNEL_GPIO_PORT();
-	//TIMx_Slave_CHANNEL_GPIO_PORT();
 	TIMx_32bits_CHANNEL_GPIO_PORT();
 	
 	// Configure  (TIM3x_Channel) in Alternate function, push-pull and 100MHz speed
-	//GPIO_InitStruct.Pin = GPIO_PIN_TIMx_Master_CHANNEL_1;
 	GPIO_InitStruct.Pin = GPIO_PIN_TIMx_32bits_CHANNEL_1;
 	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	//GPIO_InitStruct.Alternate = GPIO_AF_TIMx_Master;
 	GPIO_InitStruct.Alternate = GPIO_AF_TIMx_32bits;
-	
-	//HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
-	//GPIO_InitStruct.Pin = GPIO_PIN_TIMx_Slave_CHANNEL_1;
-	//GPIO_InitStruct.Alternate = GPIO_AF_TIMx_Slave;
-	
-	//HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	
-	
-	// Configure  (TIM2x_Channel) in Alternate function, push-pull and 100MHz speed
-	//GPIO_InitStruct.Pin = GPIO_PIN_TIMx_Slave_CHANNEL_1;
-	//GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	//GPIO_InitStruct.Pull = GPIO_PULLUP;
-	//GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	//GPIO_InitStruct.Alternate = GPIO_AF_TIMx_Slave;
-	
-	//HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
 	
 	 /*##-2- Configure the NVIC for TIMx ########################################*/
   /* Set the TIMx priority */
-  //HAL_NVIC_SetPriority(TIMx_Master_IRQn, 3, 0);
-	//HAL_NVIC_SetPriority(TIMx_Slave_IRQn, 3, 0);
 	HAL_NVIC_SetPriority(TIMx_32bits_IRQn, 4, 0);
+	
 	/* Enable the TIMx global Interrupt */
-  //HAL_NVIC_EnableIRQ(TIMx_Master_IRQn);
-  //HAL_NVIC_EnableIRQ(TIMx_Slave_IRQn);
 	HAL_NVIC_EnableIRQ(TIMx_32bits_IRQn);
 }
 

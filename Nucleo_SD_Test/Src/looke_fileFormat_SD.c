@@ -170,7 +170,7 @@ LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_Handl
 	
 	if(currentBlockIndex+LOOKE_SD_FILE_CACHE_SIZE >= hsd->SdCard.BlockNbr)
 	{
-	  return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDCAPACITY;
+	  return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDFULL;
 	}
 	
 	//Check SD Card State

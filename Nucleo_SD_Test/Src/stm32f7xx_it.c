@@ -53,10 +53,8 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-//extern TIM_HandleTypeDef    TimHandle;
-//extern TIM_HandleTypeDef    TimHandle_Master;
-//extern TIM_HandleTypeDef    TimHandle_Slave;
-//extern TIM_HandleTypeDef    TimHandle_32bits;
+
+extern TIM_HandleTypeDef    TimHandle_32bits;
 
 extern SD_HandleTypeDef    SDHandle_SDMMC;
 extern DMA_HandleTypeDef   hdma_sdmmc;
@@ -199,10 +197,10 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
-//void TIMx_32bits_IRQHandler(void)
-//{
-//  HAL_TIM_IRQHandler(&TimHandle_32bits);
-//}
+void TIMx_32bits_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&TimHandle_32bits);
+}
 
 
 /**

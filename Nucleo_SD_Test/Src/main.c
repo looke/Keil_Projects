@@ -174,13 +174,15 @@ int main(void)
   BSP_LED_Init(LED3);
 
 	TimHandle_32bits.Instance = TIMx_32bits;
-	TimHandle_32bits.Init.Period            = 0xFFFFFFFF;
+	//TimHandle_32bits.Init.Period            = 0xFFFFFFFF;
+	TimHandle_32bits.Init.Period            = 10000-1;
 	//TimHandle_32bits.Init.Prescaler         = 26;	// 108Mhz/27 = 4Mhz
 	TimHandle_32bits.Init.Prescaler         = 2;	// 108Mhz/3 = 36Mhz
+	TimHandle_32bits.Init.Prescaler         = 107;	// 108Mhz/108 = 1Mhz
   TimHandle_32bits.Init.ClockDivision     = 0;
   TimHandle_32bits.Init.CounterMode       = TIM_COUNTERMODE_UP;
   TimHandle_32bits.Init.RepetitionCounter = 0;
-  TimHandle_32bits.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  TimHandle_32bits.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
 	
 	if (HAL_TIM_Base_Init(&TimHandle_32bits) != HAL_OK)
   {
@@ -189,7 +191,7 @@ int main(void)
   }
 	
 	//Start Time Base
-	if (HAL_TIM_Base_Start(&TimHandle_32bits) != HAL_OK)
+	if (HAL_TIM_Base_Start_IT(&TimHandle_32bits) != HAL_OK)
   {
     /* Initialization Error */
     Error_Handler();
@@ -516,6 +518,17 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 {
 	endTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
 }
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  BSP_LED_Toggle(LED1);
+}
+
 
 #ifdef  USE_FULL_ASSERT
 

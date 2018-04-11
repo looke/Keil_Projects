@@ -63,7 +63,8 @@ void SDMMC1_IRQHandler(void);
 void DMA2_Stream3_IRQHandler(void);
 //void TIMx_Master_IRQHandler(void);
 //void TIMx_Slave_IRQHandler(void);
-//void TIMx_32bits_IRQHandler(void);
+
+void TIMx_32bits_IRQHandler(void);
 
 #ifdef __cplusplus
 }
