@@ -39,9 +39,9 @@ extern "C" {
   */ 
 typedef struct
 {
-  uint32_t SectionStartBlock;                     				 /*!< Specifies the data Type                         */
+  uint32_t SectionStartBlock;                     				 /*!< Specifies the Start Block Index of Section                         */
   
-  uint32_t SectionEndBlock;                                /*!< Time Base Data array                            */
+  uint32_t SectionEndBlock;                                /*!< Specifies the End Block Index of Section                            */
 
 }LOOKE_SD_FileSys_MeasureSection_ADDIndex;
 
@@ -223,9 +223,10 @@ typedef union
 
 typedef enum
 {
-  LOOKE_SD_FILE_BUFFER_NOT_FULL     = ((uint32_t)0x00000000U),    /*!< Data Master and Slave Buffer bothh are not full   */
-	LOOKE_SD_FILE_BUFFER_HALF_FULL    = ((uint32_t)0x00000001U),    /*!< Data Master or Slave Buffer is full               */
-	LOOKE_SD_FILE_BUFFER_FULL         = ((uint32_t)0x00000002U),    /*!< Data Master and Slave Buffer are all full         */
+  LOOKE_SD_FILE_BUFFER_NOT_FULL     = ((uint32_t)0x00000000U),    /*!< Data Master and Slave Buffer both are not full   */
+	LOOKE_SD_FILE_BUFFER_NEED_SYNC    = ((uint32_t)0x00000001U),    /*!< Data Master or Slave Buffer is full               */
+	//LOOKE_SD_FILE_BUFFER_HALF_FULL    = ((uint32_t)0x00000001U),    /*!< Data Master or Slave Buffer is full               */
+	//LOOKE_SD_FILE_BUFFER_FULL         = ((uint32_t)0x00000002U),    /*!< Data Master and Slave Buffer are all full         */
 }LOOKE_SD_FILE_Buffer_State;
 
 typedef enum
@@ -241,9 +242,9 @@ typedef enum
 typedef struct
 {
 	
-	uint32_t CurrentBlockIndex;
+	uint32_t CurrentBlockIndex;                                  /*!< Specifies the Block that contains the new data                 */
 	
-  uint32_t CurrentMeasureIndex;
+  uint32_t CurrentMeasureIndex;                                /*!< Specifies the last data in the block                           */
 	
 	LOOKE_SD_FILE_Buffer_Current CurrentDataBuffer;              /*!< Specifies the Data Buffer currently in use Master or Slave     */
 	
@@ -262,7 +263,6 @@ typedef struct
   */ 
 typedef struct
 {
-	
 	uint32_t CurrentBlockIndex;                                          /*!< Specifies the Block that contains the new data                 */
 	
   uint32_t CurrentMeasureIndex;                                        /*!< Specifies the last data in the block                           */
@@ -277,6 +277,8 @@ typedef struct
 
 }LOOKE_SD_TimeBase_Data_Cache;
 
+HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_TimeBase_Data_Cache* pCache, LOOKE_SD_TimeBase_Data* pData);
+HAL_StatusTypeDef LOOKE_SD_File_AddARHSMeasureToCache(LOOKE_SD_ARHS_Data_Cache* pCache, LOOKE_SD_ARHS_Data* pData);
 
 /** @defgroup SD_File_Functions_Group2 cache functions
   * @{
@@ -292,7 +294,7 @@ typedef enum
 
 LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_ARHS_Data_Cache *pCache);
 
-HAL_StatusTypeDef LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_HandleTypeDef *hsd, LOOKE_SD_TimeBase_Data_Cache *pCahce);
+LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_TimeBase_Data_Cache *pCache);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////

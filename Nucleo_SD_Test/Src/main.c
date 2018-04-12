@@ -175,7 +175,7 @@ int main(void)
 
 	TimHandle_32bits.Instance = TIMx_32bits;
 	//TimHandle_32bits.Init.Period            = 0xFFFFFFFF;
-	TimHandle_32bits.Init.Period            = 10000-1;
+	TimHandle_32bits.Init.Period            = 500000-1;
 	//TimHandle_32bits.Init.Prescaler         = 26;	// 108Mhz/27 = 4Mhz
 	TimHandle_32bits.Init.Prescaler         = 2;	// 108Mhz/3 = 36Mhz
 	TimHandle_32bits.Init.Prescaler         = 107;	// 108Mhz/108 = 1Mhz
@@ -301,7 +301,7 @@ int main(void)
 	//SD_FileSysParaUnion.FileSysPara.SectionIndexArray[0].SectionEndBlock = 1;
 	
   //LOOKE_SD_File_WriteSysPara(&SDHandle_SDMMC, SD_FileSysParaUnion.DataArray);
-	LOOKE_SD_File_ReadSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion);
+	//LOOKE_SD_File_ReadSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion);
 	
 	//if(HAL_SD_ReadBlocks_DMA(&SDHandle_SDMMC1, aBuffer_Block_Rx, 0x00, 1) == HAL_OK)
 	//{
@@ -400,7 +400,7 @@ int main(void)
 	  //}
 		
 		timeEclipse = endTimeStamp - startTimeStamp;
-		BSP_LED_Toggle(LED3);
+		//BSP_LED_Toggle(LED3);
 		DelaySomeTime();
 		//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
   }
