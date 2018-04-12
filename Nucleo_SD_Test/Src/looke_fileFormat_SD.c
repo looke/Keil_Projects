@@ -159,7 +159,7 @@ HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_TimeBase_Data
 		pCache->CurrentMeasureIndex = 0x0000;
 		pCache->CurrentBlockIndex++;
 		
-		if(pCache->CurrentBlockIndex == LOOKE_SD_FILE_CACHE_SIZE)
+		if(pCache->CurrentBlockIndex >= LOOKE_SD_FILE_CACHE_SIZE)
 	  {
 			//Buffer is Full, Should Switch to Empty Buffer and Sync Full Buffer
 			
@@ -206,7 +206,7 @@ HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_TimeBase_Data
   pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].TimeBaseData[pCache->CurrentMeasureIndex].DataIndex = pData->DataIndex;
 	pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].TimeBaseData[pCache->CurrentMeasureIndex].TimeStamp = pData->TimeStamp;
 		
-	//Increase Buffer Index and Check Buffer if FULL
+	//Increase Buffer Index
 	pCache->CurrentMeasureIndex++;	
 	//}
 	return HAL_OK;
@@ -223,8 +223,70 @@ HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_TimeBase_Data
   */
 HAL_StatusTypeDef LOOKE_SD_File_AddARHSMeasureToCache(LOOKE_SD_ARHS_Data_Cache* pCache, LOOKE_SD_ARHS_Data* pData)
 {
+	LOOKE_SD_ARHS_Data_Buffer_Union *pBufferUnion;
 	
+  if(pCache->CurrentMeasureIndex == AHRS_BLOCK_DATA_SIZE)
+	{
+    pCache->CurrentMeasureIndex = 0x0000;
+		pCache->CurrentBlockIndex++;
+		
+		if(pCache->CurrentBlockIndex >= LOOKE_SD_FILE_CACHE_SIZE)
+	  {
+			//Buffer is Full, Should Switch to Empty Buffer and Sync Full Buffer
+			
+			//Check Buffer State
+		  if(pCache->CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC)
+		  {
+			  //Cache Master and Slave Buffer both are Full.
+			  return HAL_ERROR;
+		  }
+		 
+		  //Clear Buffer Index
+		  pCache->CurrentMeasureIndex = 0x0000;
+		  pCache->CurrentBlockIndex = 0x0000;
+			
+		  //Switch Buffer
+		  if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
+	    {
+		    pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_SLAVE;
+	    }
+	    else
+		  {
+			  pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_MASTER;
+		  }
+			
+		  //Put Buffer State to Need Sync
+		  pCache->CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
+	  }		
+	}
 	
+	// Find Cache Buffer currently in use
+	if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
+	{
+		pBufferUnion = &(pCache->ARHS_DataBuffer_Master);
+	}
+	else
+	{
+		pBufferUnion = &(pCache->ARHS_DataBuffer_Slave);
+	}
+		
+  //Put New Data into Buffer
+  pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].DataType = pData->DataType;
+	
+	pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].ACC_X = pData->ACC_X;
+	pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].ACC_Y = pData->ACC_Y;
+  pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].ACC_Z = pData->ACC_Z;
+	
+	pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].Gyro_X = pData->Gyro_X;
+	pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].Gyro_Y = pData->Gyro_Y;
+	pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].Gyro_Z = pData->Gyro_Z;
+	
+	pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].Mag_X = pData->Mag_X;
+	pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].Mag_Y = pData->Mag_Y;
+	pBufferUnion->dataBlockArray[pCache->CurrentBlockIndex].ARHS_Data[pCache->CurrentMeasureIndex].Mag_Z = pData->Mag_Z;
+	
+	//Increase Buffer Index
+	pCache->CurrentMeasureIndex++;		
   return HAL_OK;
 };
 
