@@ -154,44 +154,43 @@ HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_TimeBase_Data
 {
 	LOOKE_SD_TimeBase_Data_Buffer_Union *pBufferUnion;
 	
+	//Check MeasureIndex and Increase Block Index if Need
 	if(pCache->CurrentMeasureIndex == TIMEBASE_BLOCK_DATA_SIZE)
 	{
 		pCache->CurrentMeasureIndex = 0x0000;
 		pCache->CurrentBlockIndex++;
+	}
 		
-		if(pCache->CurrentBlockIndex >= LOOKE_SD_FILE_CACHE_SIZE)
-	  {
-			//Buffer is Full, Should Switch to Empty Buffer and Sync Full Buffer
+	//Check Block Index and Switch Buffer if Need
+	if(pCache->CurrentBlockIndex >= LOOKE_SD_FILE_CACHE_SIZE)
+	{
+		//Buffer is Full, Should Switch to Empty Buffer and Sync Full Buffer
 			
-			//Check Buffer State
-		  if(pCache->CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC)
-		  {
-			  //Cache Master and Slave Buffer both are Full.
-			  return HAL_ERROR;
-		  }
+		////Check Buffer State in Case the Master and Slave Buffer all Full
+		if(pCache->CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC)
+		{
+			//Cache Master and Slave Buffer both are Full.
+			return HAL_ERROR;
+		}
 		 
-		  //Clear Buffer Index
-		  pCache->CurrentMeasureIndex = 0x0000;
-		  pCache->CurrentBlockIndex = 0x0000;
+		//Clear Buffer Index
+		pCache->CurrentMeasureIndex = 0x0000;
+		pCache->CurrentBlockIndex = 0x0000;
 			
-		  //Switch Buffer
-		  if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
-	    {
-		    pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_SLAVE;
-	    }
-	    else
-		  {
-			  pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_MASTER;
-		  }
-			
-		  //Put Buffer State to Need Sync
-		  pCache->CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
+		//Switch Buffer
+		if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
+	  {
+		  pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_SLAVE;
 	  }
+	  else
+		{
+			pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_MASTER;
+		}
+			
+		//Put Buffer State to Need Sync
+		pCache->CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
 	}
 
-	//
-  //if(pCache->CurrentBlockIndex < LOOKE_SD_FILE_CACHE_SIZE && pCache->CurrentMeasureIndex < TIMEBASE_BLOCK_DATA_SIZE)
-	//{
 	// Find Cache Buffer currently in use
 	if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
 	{
@@ -208,7 +207,7 @@ HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_TimeBase_Data
 		
 	//Increase Buffer Index
 	pCache->CurrentMeasureIndex++;	
-	//}
+
 	return HAL_OK;
 };
 
@@ -225,41 +224,43 @@ HAL_StatusTypeDef LOOKE_SD_File_AddARHSMeasureToCache(LOOKE_SD_ARHS_Data_Cache* 
 {
 	LOOKE_SD_ARHS_Data_Buffer_Union *pBufferUnion;
 	
-  if(pCache->CurrentMeasureIndex == AHRS_BLOCK_DATA_SIZE)
+	//Check MeasureIndex and Increase Block Index if Need
+  if(pCache->CurrentMeasureIndex >= AHRS_BLOCK_DATA_SIZE)
 	{
     pCache->CurrentMeasureIndex = 0x0000;
 		pCache->CurrentBlockIndex++;
-		
-		if(pCache->CurrentBlockIndex >= LOOKE_SD_FILE_CACHE_SIZE)
-	  {
-			//Buffer is Full, Should Switch to Empty Buffer and Sync Full Buffer
-			
-			//Check Buffer State
-		  if(pCache->CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC)
-		  {
-			  //Cache Master and Slave Buffer both are Full.
-			  return HAL_ERROR;
-		  }
-		 
-		  //Clear Buffer Index
-		  pCache->CurrentMeasureIndex = 0x0000;
-		  pCache->CurrentBlockIndex = 0x0000;
-			
-		  //Switch Buffer
-		  if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
-	    {
-		    pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_SLAVE;
-	    }
-	    else
-		  {
-			  pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_MASTER;
-		  }
-			
-		  //Put Buffer State to Need Sync
-		  pCache->CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
-	  }		
 	}
-	
+
+	//Check Block Index and Switch Buffer if Need
+	if(pCache->CurrentBlockIndex >= LOOKE_SD_FILE_CACHE_SIZE)
+	{
+	  //Buffer is Full, Should Switch to Empty Buffer and Sync Full Buffer
+			
+		//Check Buffer State in Case the Master and Slave Buffer all Full
+		if(pCache->CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC)
+		{
+		  //Cache Master and Slave Buffer both are Full.
+		  return HAL_ERROR;
+		}
+		 
+		//Clear Buffer Index
+		pCache->CurrentMeasureIndex = 0x0000;
+		pCache->CurrentBlockIndex = 0x0000;
+			
+		//Switch Buffer
+		if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
+	  {
+		  pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_SLAVE;
+	  }
+	  else
+		{
+			pCache->CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_MASTER;
+		}
+			
+		//Put Buffer State to Need Sync
+		pCache->CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
+	}
+
 	// Find Cache Buffer currently in use
 	if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
 	{
