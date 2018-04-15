@@ -134,12 +134,15 @@ HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOK
 	//Write New File System Parameters to SD Card
 	if(HAL_SD_WriteBlocks(hsd, pFileSysPara->DataArray, 0, 1, 0x0FF) != HAL_OK )
 	{
+		
+		//If Write Failed. Recover FileSysPara
 		pFileSysPara->FileSysPara.NumberOfMeasurementSection = measureSectionNum;
 	  pFileSysPara->FileSysPara.SectionIndexArray[measureSectionNum].SectionStartBlock = 0;
 	  pFileSysPara->FileSysPara.SectionIndexArray[measureSectionNum].SectionEndBlock = 0;
 
 		return HAL_ERROR;
 	}
+	
 	return HAL_OK;
 };
 
