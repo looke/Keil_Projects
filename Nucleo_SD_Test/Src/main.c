@@ -103,6 +103,8 @@ __align(4) uint8_t align[16];
 //__align(4) uint8_t aBuffer_Block_Tx[BLOCK_SIZE*CACHE_SIZE];
 
 __align(4) LOOKE_SD_FileSys_Para_Union SD_FileSysParaUnion;
+__align(4) LOOKE_SD_Global_Data_Cache SD_File_Cache;
+
 
 //__align(4) LOOKE_SD_ARHS_Data_Cache ARHS_cache;
 //__align(4) LOOKE_SD_TimeBase_Data_Cache TimeBase_cache;
@@ -122,7 +124,12 @@ uint32_t startTimeStamp;
 uint32_t endTimeStamp;
 uint32_t timeEclipse;
 
+uint32_t timeTest;
+
 uint32_t sizeTest;
+
+LOOKE_SD_TimeBase_Data timeBaseDataTest;
+
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void Error_Handler(void);
@@ -175,10 +182,10 @@ int main(void)
 
 	TimHandle_32bits.Instance = TIMx_32bits;
 	//TimHandle_32bits.Init.Period            = 0xFFFFFFFF;
-	TimHandle_32bits.Init.Period            = 500000-1;
-	//TimHandle_32bits.Init.Prescaler         = 26;	// 108Mhz/27 = 4Mhz
-	TimHandle_32bits.Init.Prescaler         = 2;	// 108Mhz/3 = 36Mhz
-	TimHandle_32bits.Init.Prescaler         = 107;	// 108Mhz/108 = 1Mhz
+	TimHandle_32bits.Init.Period            = 100000-1;
+	TimHandle_32bits.Init.Prescaler         = 26;	// 108Mhz/27 = 4Mhz
+	//TimHandle_32bits.Init.Prescaler         = 2;	// 108Mhz/3 = 36Mhz
+	//TimHandle_32bits.Init.Prescaler         = 107;	// 108Mhz/108 = 1Mhz
   TimHandle_32bits.Init.ClockDivision     = 0;
   TimHandle_32bits.Init.CounterMode       = TIM_COUNTERMODE_UP;
   TimHandle_32bits.Init.RepetitionCounter = 0;
@@ -526,7 +533,14 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+	//Test SD File Cache
   BSP_LED_Toggle(LED1);
+	timeTest++;
+	
+	timeBaseDataTest.DataIndex = timeTest;
+	timeBaseDataTest.TimeStamp = timeTest;
+	
+	LOOKE_SD_File_AddTimeBaseMeasureToCache(&SD_File_Cache.TimeBase_Cache,&timeBaseDataTest);
 }
 
 
