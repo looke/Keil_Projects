@@ -292,9 +292,6 @@ typedef enum
 	
 }LOOKE_SD_FILE_SYNC_TRANSFER_RESULT;
 
-LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_ARHS_Data_Cache *pCache);
-
-LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_TimeBase_Data_Cache *pCache);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -305,10 +302,14 @@ LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_H
 ////////////////////////////////////////////////////////////////////////////////////////
 typedef enum
 {
-  LOOKE_SD_FILE_GLOBLE_CACHE_STATE_TRANSFER   = ((uint32_t)0x00000000U),    /*!< Data Buffer is not in Sync Process and ready for Sync          */
-	LOOKE_SD_FILE_GLOBLE_CACHE_STATE_SYNC       = ((uint32_t)0x00000001U),    /*!< Data Buffer is in Sync Process and is writing data to SD Card  */
-	LOOKE_SD_FILE_GLOBLE_CACHE_STATE_STOP       = ((uint32_t)0x00000002U),    /*!< Data Collection is stopped                                     */
-}LOOKE_SD_FILE_GLOBLE_CACHE_STATE;
+  LOOKE_SD_FILE_GLOBAL_CACHE_STATE_STOP          = ((uint32_t)0x00000000U),    /*!< Data Buffer is not in Sync Process and ready for Sync          */
+	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ARHS     = ((uint32_t)0x00000001U),    /*!< ARHS Data Buffer is in Sync Process and is writing data to SD Card  */
+	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_TIMEBASE = ((uint32_t)0x00000002U),    /*!< TIMEBASE Data Buffer is in Sync Process and is writing data to SD Card  */
+	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER      = ((uint32_t)0x00000003U),    /*!< Data Collection is stopped                                     */
+	
+	
+	
+}LOOKE_SD_FILE_GLOBAL_CACHE_STATE;
 
 /** 
   * @brief  SD Card Global Data Cache Structure definition
@@ -316,13 +317,19 @@ typedef enum
   */ 
 typedef struct
 {
-	LOOKE_SD_FILE_GLOBLE_CACHE_STATE CurrentState;    /*!< Specifies the Cache State             */
+	LOOKE_SD_FILE_GLOBAL_CACHE_STATE CurrentGlobalState;    /*!< Specifies the Cache State             */
 	
   LOOKE_SD_TimeBase_Data_Cache TimeBase_Cache;      /*!< Time Base Data Cache                  */
 
   LOOKE_SD_ARHS_Data_Cache ARHS_Cache;              /*!< ARHS Data Cache                       */
 
 }LOOKE_SD_Global_Data_Cache;
+
+
+LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_Global_Data_Cache *pCache);
+
+LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_Global_Data_Cache *pCache);
+
 
 
 #ifdef __cplusplus

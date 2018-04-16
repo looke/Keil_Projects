@@ -406,10 +406,26 @@ int main(void)
 		//	Error_Handler();
 	  //}
 		
+		/*
 		timeEclipse = endTimeStamp - startTimeStamp;
-		//BSP_LED_Toggle(LED3);
 		DelaySomeTime();
+		*/
+		
+		//Check Cache Globle State and Buffer State. Start Sync Process if Need;
+		if(SD_File_Cache.TimeBase_Cache.CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC && SD_File_Cache.CurrentGlobalState == LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER)
+		{
+
+			//Sync Process
+		  DelaySomeTime();
+			
+			//Switch States(Should be done in Interrupt procedure)
+			SD_File_Cache.TimeBase_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
+			SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
+		}
+		
+		
 		//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
+		//BSP_LED_Toggle(LED3);
   }
 }
 
@@ -517,13 +533,27 @@ void DelaySomeTime(void)
    while(time--)
    {
       i=0xFF;
-      while(i--);    
+      while(i--);
    }
 }
 
 void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 {
-	endTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
+	//endTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
+	
+	//After DMA TX Transfer, Switch State
+	if(SD_File_Cache.CurrentGlobalState == LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_TIMEBASE)
+	{
+	  SD_File_Cache.TimeBase_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NOT_FULL;
+	}
+	else if(SD_File_Cache.CurrentGlobalState == LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ARHS)
+	{
+	  SD_File_Cache.ARHS_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NOT_FULL;
+	}
+	
+	
+	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
+	
 }
 
 /**

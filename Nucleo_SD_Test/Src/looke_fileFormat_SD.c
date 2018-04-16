@@ -301,20 +301,20 @@ HAL_StatusTypeDef LOOKE_SD_File_AddARHSMeasureToCache(LOOKE_SD_ARHS_Data_Cache* 
   * @param  hsd: Pointer to the SD handle
   * @retval LOOKE_SD_FILE_TRANSFER_RESULT
   */
-LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_ARHS_Data_Cache *pCache)
+LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_Global_Data_Cache *pCache)
 {
 	LOOKE_SD_ARHS_Data_Buffer_Union *pBufferUnion;
 	uint8_t currentBlockIndexOnSD;
   
 	// Find Cache Buffer currently in use
   // The one that not in use should be sync to SD card
-	if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
+	if(pCache->ARHS_Cache.CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
 	{
-		pBufferUnion = &(pCache->ARHS_DataBuffer_Slave);
+		pBufferUnion = &(pCache->ARHS_Cache.ARHS_DataBuffer_Slave);
 	}
 	else
 	{
-		pBufferUnion = &(pCache->ARHS_DataBuffer_Master);
+		pBufferUnion = &(pCache->ARHS_Cache.ARHS_DataBuffer_Master);
 	}
 	
 	//Find the end Block of Current Measure Section
@@ -333,9 +333,15 @@ LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_Handl
 		return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDBUSY;
 	}
 	
+  //Set Globle State to SYNC_ARHS
+	pCache->CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ARHS;
+	
+	
 	//Start DMA Write Transfer
 	if (HAL_SD_WriteBlocks_DMA(hsd, pBufferUnion->DataArray, currentBlockIndexOnSD, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK)
 	{
+		//ReSet Globle State to SYNC_TIMEBASE
+	  pCache->CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
 		return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_DMA;
 	}
 	
@@ -358,20 +364,21 @@ LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_Handl
   * @param  hsd: Pointer to the SD handle
   * @retval LOOKE_SD_FILE_TRANSFER_RESULT
   */
-LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_TimeBase_Data_Cache *pCache)
+LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_Global_Data_Cache *pCache)
 {
 	LOOKE_SD_TimeBase_Data_Buffer_Union *pBufferUnion;
 	uint8_t currentBlockIndexOnSD;
-  
+
+	
 	// Find Cache Buffer currently in use
   // The one that not in use should be sync to SD card
-	if(pCache->CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
+	if(pCache->TimeBase_Cache.CurrentDataBuffer == LOOKE_SD_FILE_BUFFER_MASTER)
 	{
-		pBufferUnion = &(pCache->TimeBase_DataBuffer_Slave);
+		pBufferUnion = &(pCache->TimeBase_Cache.TimeBase_DataBuffer_Slave);
 	}
 	else
 	{
-		pBufferUnion = &(pCache->TimeBase_DataBuffer_Master);
+		pBufferUnion = &(pCache->TimeBase_Cache.TimeBase_DataBuffer_Master);
 	}
 	
 	//Find the end Block of Current Measure Section
@@ -390,9 +397,14 @@ LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_H
 		return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_SDBUSY;
 	}
 	
+	//Set Globle State to SYNC_TIMEBASE
+	pCache->CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_TIMEBASE;
+	
 	//Start DMA Write Transfer
 	if (HAL_SD_WriteBlocks_DMA(hsd, pBufferUnion->DataArray, currentBlockIndexOnSD, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK)
 	{
+		//ReSet Globle State to SYNC_TIMEBASE
+	  pCache->CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
 		return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_DMA;
 	}
 	
