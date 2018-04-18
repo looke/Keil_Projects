@@ -114,9 +114,9 @@ __align(4) LOOKE_SD_Global_Data_Cache SD_File_Cache;
 //LOOKE_SD_TimeBase_Data_Block TimeBaseDataBlock;
 //LOOKE_SD_ARHS_Data_Block AHRSDataBlock;
 
-//__align(4) uint8_t aBuffer_Block_Tx_Write[BLOCK_SIZE];
-//uint8_t aBuffer_Block_Rx[BLOCK_SIZE];
-//uint8_t aBuffer_Block_Tx[BLOCK_SIZE];
+//__align(4) uint8_t aBuffer_Block_Tx_Write[LOOKE_SD_FILE_BLOCK_SIZE];
+__align(4) uint8_t aBuffer_Block_Rx[LOOKE_SD_FILE_BLOCK_SIZE];
+__align(4) uint8_t aBuffer_Block_Tx[LOOKE_SD_FILE_BLOCK_SIZE];
 /* Prescaler declaration */
 __IO uint32_t uwPrescalerValue = 0;
 
@@ -180,6 +180,11 @@ int main(void)
   BSP_LED_Init(LED1);
   BSP_LED_Init(LED3);
 
+	//Setup Global Cache
+	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
+  SD_File_Cache.TimeBase_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NOT_FULL;
+  SD_File_Cache.TimeBase_Cache.CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_MASTER;
+	
 	TimHandle_32bits.Instance = TIMx_32bits;
 	//TimHandle_32bits.Init.Period            = 0xFFFFFFFF;
 	TimHandle_32bits.Init.Period            = 100000-1;
@@ -190,19 +195,7 @@ int main(void)
   TimHandle_32bits.Init.CounterMode       = TIM_COUNTERMODE_UP;
   TimHandle_32bits.Init.RepetitionCounter = 0;
   TimHandle_32bits.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-	
-	if (HAL_TIM_Base_Init(&TimHandle_32bits) != HAL_OK)
-  {
-    /* Initialization Error */
-    Error_Handler();
-  }
-	
-	//Start Time Base
-	if (HAL_TIM_Base_Start_IT(&TimHandle_32bits) != HAL_OK)
-  {
-    /* Initialization Error */
-    Error_Handler();
-  }
+
 
   /*##-1- Configure the SD peripheral #######################################*/
   SDHandle_SDMMC.Instance = SDMMC2;
@@ -270,15 +263,8 @@ int main(void)
   hdma_sdmmc.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
   hdma_sdmmc.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
 	
-	//DMA read process must use DMA_SxCR_PFCTRL
 	hdma_sdmmc.Init.Mode = DMA_SxCR_PFCTRL;
-	
-	//DMA write process must use DMA_NORMAL
-	//hdma_sdmmc.Init.Mode = DMA_NORMAL;
-	
-	
   hdma_sdmmc.Init.Priority = DMA_PRIORITY_VERY_HIGH;
-	
 	hdma_sdmmc.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
 	hdma_sdmmc.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
 	hdma_sdmmc.Init.MemBurst = DMA_MBURST_INC4;
@@ -292,8 +278,11 @@ int main(void)
   {
     Error_Handler();
   }
-		
+	
+	//DMA Read Link
 	//__HAL_LINKDMA(&SDHandle_SDMMC,hdmarx,hdma_sdmmc);
+	
+	//DMA Write Link
 	__HAL_LINKDMA(&SDHandle_SDMMC,hdmatx,hdma_sdmmc);
 
 	/* DMA interrupt init */
@@ -301,32 +290,36 @@ int main(void)
   HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
 	
-
+  /*
+	//Format SD File SYSPara
+	SD_FileSysParaUnion.FileSysPara.NumberOfMeasurementSection = 0;
+	SD_FileSysParaUnion.FileSysPara.SectionIndexArray[0].SectionStartBlock = 0;
+	SD_FileSysParaUnion.FileSysPara.SectionIndexArray[0].SectionEndBlock = 0;
+  LOOKE_SD_File_WriteSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion);
+	*/
 	
-	//SD_FileSysParaUnion.FileSysPara.NumberOfMeasurementSection = 1;
-	//SD_FileSysParaUnion.FileSysPara.SectionIndexArray[0].SectionStartBlock = 1;
-	//SD_FileSysParaUnion.FileSysPara.SectionIndexArray[0].SectionEndBlock = 1;
+	//Init SD File SYSPara
+	LOOKE_SD_File_ReadSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion);
 	
-  //LOOKE_SD_File_WriteSysPara(&SDHandle_SDMMC, SD_FileSysParaUnion.DataArray);
-	//LOOKE_SD_File_ReadSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion);
-	
-	//if(HAL_SD_ReadBlocks_DMA(&SDHandle_SDMMC1, aBuffer_Block_Rx, 0x00, 1) == HAL_OK)
-	//{
-	//  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
+	/*
+	if(HAL_SD_ReadBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Rx, 0x10, 1) == HAL_OK)
+	{
+	  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 	//}
+	*/
 	
 	/*
 	uint16_t initForBuffer;
-	for(initForBuffer = 0 ; initForBuffer<BLOCK_SIZE*CACHE_SIZE; initForBuffer++)
+	for(initForBuffer = 0 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE; initForBuffer++)
 	{
 		aBuffer_Block_Tx[initForBuffer] = 0x77;
 	}
 	
 	SCB_CleanDCache();
 	
-	startTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
+	//startTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
 	
-	if(HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, 0x00, CACHE_SIZE) == HAL_OK)
+	if(HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, 0x10, 1) == HAL_OK)
 	{
 	  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 		//Error_Handler();
@@ -396,6 +389,24 @@ int main(void)
 	//	aBuffer_Block_Tx[i] = i;
 	//}
 	
+	
+	
+	/*
+	//Set Timer for test case
+	if (HAL_TIM_Base_Init(&TimHandle_32bits) != HAL_OK)
+  {
+    //Initialization Error
+    Error_Handler();
+  }
+	
+	//Start Time Base
+	if (HAL_TIM_Base_Start_IT(&TimHandle_32bits) != HAL_OK)
+  {
+    //Initialization Error
+    Error_Handler();
+  }
+	*/
+	
   while (1)
   {
 		//SDState = HAL_SD_GetState(&SDHandle_SDMMC1);
@@ -416,11 +427,8 @@ int main(void)
 		{
 
 			//Sync Process
-		  DelaySomeTime();
-			
-			//Switch States(Should be done in Interrupt procedure)
-			SD_File_Cache.TimeBase_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
-			SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
+		  LOOKE_SD_FILE_SYNC_TRANSFER_RESULT syncResult = LOOKE_SD_File_SyncCacheToSDCard_TimeBase(&SDHandle_SDMMC, &SD_FileSysParaUnion.FileSysPara, &SD_File_Cache);
+
 		}
 		
 		
@@ -523,6 +531,9 @@ static void CPU_CACHE_Enable(void)
 void HAL_SD_ErrorCallback(SD_HandleTypeDef *hsd)
 {
 	uint32_t error = hsd->hdmarx->ErrorCode;
+	
+	//After SD TX Transfer ERROR, Recover SD Cache Global State
+	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
 }
 
 
@@ -551,9 +562,13 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 	  SD_File_Cache.ARHS_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NOT_FULL;
 	}
 	
+	//Update File SysPara
+	uint32_t measureSectionNum = SD_FileSysParaUnion.FileSysPara.NumberOfMeasurementSection;
+	SD_FileSysParaUnion.FileSysPara.SectionIndexArray[measureSectionNum].SectionEndBlock += LOOKE_SD_FILE_CACHE_SIZE;
+	//Sync File SysPara to SD Card
+	
 	
 	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
-	
 }
 
 /**
@@ -570,7 +585,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	timeBaseDataTest.DataIndex = timeTest;
 	timeBaseDataTest.TimeStamp = timeTest;
 	
-	LOOKE_SD_File_AddTimeBaseMeasureToCache(&SD_File_Cache.TimeBase_Cache,&timeBaseDataTest);
+	LOOKE_SD_File_AddTimeBaseMeasureToCache(&SD_File_Cache,&timeBaseDataTest);
 }
 
 

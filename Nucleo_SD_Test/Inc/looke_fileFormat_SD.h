@@ -277,8 +277,7 @@ typedef struct
 
 }LOOKE_SD_TimeBase_Data_Cache;
 
-HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_TimeBase_Data_Cache* pCache, LOOKE_SD_TimeBase_Data* pData);
-HAL_StatusTypeDef LOOKE_SD_File_AddARHSMeasureToCache(LOOKE_SD_ARHS_Data_Cache* pCache, LOOKE_SD_ARHS_Data* pData);
+
 
 /** @defgroup SD_File_Functions_Group2 cache functions
   * @{
@@ -325,6 +324,10 @@ typedef struct
 
 }LOOKE_SD_Global_Data_Cache;
 
+
+HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_Global_Data_Cache* pCache, LOOKE_SD_TimeBase_Data* pData);
+
+HAL_StatusTypeDef LOOKE_SD_File_AddARHSMeasureToCache(LOOKE_SD_Global_Data_Cache* pCache, LOOKE_SD_ARHS_Data* pData);
 
 LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para *pFileSysPara, LOOKE_SD_Global_Data_Cache *pCache);
 
