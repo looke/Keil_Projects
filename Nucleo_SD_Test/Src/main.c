@@ -188,8 +188,9 @@ int main(void)
 	TimHandle_32bits.Instance = TIMx_32bits;
 	//TimHandle_32bits.Init.Period            = 0xFFFFFFFF;
 	TimHandle_32bits.Init.Period            = 100000-1;
-	TimHandle_32bits.Init.Prescaler         = 26;	// 108Mhz/27 = 4Mhz
+	//TimHandle_32bits.Init.Prescaler         = 26;	// 108Mhz/27 = 4Mhz
 	//TimHandle_32bits.Init.Prescaler         = 2;	// 108Mhz/3 = 36Mhz
+	TimHandle_32bits.Init.Prescaler         = 8;	// 108Mhz/9 = 12Mhz
 	//TimHandle_32bits.Init.Prescaler         = 107;	// 108Mhz/108 = 1Mhz
   TimHandle_32bits.Init.ClockDivision     = 0;
   TimHandle_32bits.Init.CounterMode       = TIM_COUNTERMODE_UP;
@@ -253,20 +254,25 @@ int main(void)
 	hdma_sdmmc.Init.Channel = DMA_CHANNEL_11;
 	
 	//DMA read process DMA_PERIPH_TO_MEMORY
-	//hdma_sdmmc.Init.Direction = DMA_PERIPH_TO_MEMORY;
+	hdma_sdmmc.Init.Direction = DMA_PERIPH_TO_MEMORY;
 	
 	//DMA write process DMA_MEMORY_TO_PERIPH
-	hdma_sdmmc.Init.Direction = DMA_MEMORY_TO_PERIPH;
+	//hdma_sdmmc.Init.Direction = DMA_MEMORY_TO_PERIPH;
 	
   hdma_sdmmc.Init.PeriphInc = DMA_PINC_DISABLE;
   hdma_sdmmc.Init.MemInc = DMA_MINC_ENABLE;
-  hdma_sdmmc.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-  hdma_sdmmc.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+  
+	//hdma_sdmmc.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+	hdma_sdmmc.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+  //hdma_sdmmc.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+	hdma_sdmmc.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
 	
 	hdma_sdmmc.Init.Mode = DMA_SxCR_PFCTRL;
   hdma_sdmmc.Init.Priority = DMA_PRIORITY_VERY_HIGH;
 	hdma_sdmmc.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
-	hdma_sdmmc.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+	//hdma_sdmmc.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+	
+	hdma_sdmmc.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_HALFFULL;
 	hdma_sdmmc.Init.MemBurst = DMA_MBURST_INC4;
 	hdma_sdmmc.Init.PeriphBurst = DMA_PBURST_INC4;
 	
@@ -280,10 +286,10 @@ int main(void)
   }
 	
 	//DMA Read Link
-	//__HAL_LINKDMA(&SDHandle_SDMMC,hdmarx,hdma_sdmmc);
+	__HAL_LINKDMA(&SDHandle_SDMMC,hdmarx,hdma_sdmmc);
 	
 	//DMA Write Link
-	__HAL_LINKDMA(&SDHandle_SDMMC,hdmatx,hdma_sdmmc);
+	//__HAL_LINKDMA(&SDHandle_SDMMC,hdmatx,hdma_sdmmc);
 
 	/* DMA interrupt init */
   /* DMA2_Channel4_5_IRQn interrupt configuration */
@@ -301,12 +307,12 @@ int main(void)
 	//Init SD File SYSPara
 	LOOKE_SD_File_ReadSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion);
 	
-	/*
+	
 	if(HAL_SD_ReadBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Rx, 0x10, 1) == HAL_OK)
 	{
 	  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
-	//}
-	*/
+	}
+	
 	
 	/*
 	uint16_t initForBuffer;
@@ -530,7 +536,7 @@ static void CPU_CACHE_Enable(void)
 
 void HAL_SD_ErrorCallback(SD_HandleTypeDef *hsd)
 {
-	uint32_t error = hsd->hdmarx->ErrorCode;
+	uint32_t error = hsd->hdmatx->ErrorCode;
 	
 	//After SD TX Transfer ERROR, Recover SD Cache Global State
 	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
@@ -564,7 +570,9 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 	
 	//Update File SysPara
 	uint32_t measureSectionNum = SD_FileSysParaUnion.FileSysPara.NumberOfMeasurementSection;
-	SD_FileSysParaUnion.FileSysPara.SectionIndexArray[measureSectionNum].SectionEndBlock += LOOKE_SD_FILE_CACHE_SIZE;
+	
+	SD_FileSysParaUnion.FileSysPara.SectionIndexArray[measureSectionNum-1].SectionEndBlock += LOOKE_SD_FILE_CACHE_SIZE;
+	
 	//Sync File SysPara to SD Card
 	
 	

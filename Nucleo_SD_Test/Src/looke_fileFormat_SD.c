@@ -338,9 +338,10 @@ LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_Handl
 	
 	
 	//Start DMA Write Transfer
+	SCB_CleanDCache();
 	if (HAL_SD_WriteBlocks_DMA(hsd, pBufferUnion->DataArray, currentBlockIndexOnSD, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK)
 	{
-		//ReSet Globle State to SYNC_TIMEBASE
+		//ReSet Globle State to SYNC_TRANSFER
 	  pCache->CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
 		return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_DMA;
 	}
@@ -401,6 +402,7 @@ LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_H
 	pCache->CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_TIMEBASE;
 	
 	//Start DMA Write Transfer
+	SCB_CleanDCache();
 	if (HAL_SD_WriteBlocks_DMA(hsd, pBufferUnion->DataArray, currentBlockIndexOnSD, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK)
 	{
 		//Recover Globle State to LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER
