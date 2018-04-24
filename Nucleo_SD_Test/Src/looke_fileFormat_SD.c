@@ -155,6 +155,12 @@ HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOK
   */
 HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_Global_Data_Cache* pCache, LOOKE_SD_TimeBase_Data* pData)
 {
+	//Chech Cache state
+	if(pCache->CurrentGlobalState == LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ERROR)
+	{
+	  return HAL_ERROR;
+	}
+	
 	LOOKE_SD_TimeBase_Data_Buffer_Union *pBufferUnion;
 	
 	//Check MeasureIndex and Increase Block Index if Need
@@ -225,6 +231,12 @@ HAL_StatusTypeDef LOOKE_SD_File_AddTimeBaseMeasureToCache(LOOKE_SD_Global_Data_C
   */
 HAL_StatusTypeDef LOOKE_SD_File_AddARHSMeasureToCache(LOOKE_SD_Global_Data_Cache* pCache, LOOKE_SD_ARHS_Data* pData)
 {
+	//Chech Cache state
+	if(pCache->CurrentGlobalState == LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ERROR)
+	{
+	  return HAL_ERROR;
+	}	
+
 	LOOKE_SD_ARHS_Data_Buffer_Union *pBufferUnion;
 	
 	//Check MeasureIndex and Increase Block Index if Need
@@ -345,7 +357,7 @@ LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_ARHS(SD_Handl
 	  pCache->CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
 		return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_DMA;
 	}
-	
+	HAL_SD_GetCardState(hsd);
 	return LOOKE_SD_FILE_SYNC_TRANSFER_OK;
 	
 	
@@ -409,7 +421,7 @@ LOOKE_SD_FILE_SYNC_TRANSFER_RESULT LOOKE_SD_File_SyncCacheToSDCard_TimeBase(SD_H
 	  pCache->CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
 		return LOOKE_SD_FILE_SYNC_TRANSFER_ERROR_DMA;
 	}
-	
+	HAL_SD_GetCardState(hsd);
 	return LOOKE_SD_FILE_SYNC_TRANSFER_OK;
 	
 	
