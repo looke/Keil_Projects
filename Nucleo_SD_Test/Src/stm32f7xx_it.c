@@ -55,6 +55,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 extern TIM_HandleTypeDef    TimHandle_32bits;
+extern TIM_HandleTypeDef    TimHandle_ARHS;
 
 extern SD_HandleTypeDef    SDHandle_SDMMC;
 extern DMA_HandleTypeDef   hdma_sdmmc;
@@ -201,6 +202,17 @@ void TIMx_32bits_IRQHandler(void)
 {
   HAL_TIM_IRQHandler(&TimHandle_32bits);
 }
+
+/**
+  * @brief  This function handles TIM Slave interrupt request.
+  * @param  None
+  * @retval None
+  */
+void TIMx_ARHS_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&TimHandle_ARHS);
+}
+
 
 
 /**
