@@ -219,7 +219,13 @@ typedef union
 
 }LOOKE_SD_ARHS_Data_Buffer_Union;
 
+typedef union
+{
+  uint8_t DataArray[LOOKE_SD_FILE_BLOCK_SIZE];       /*!< uint8_t data array for SD card transfer   */
+	
+  LOOKE_SD_TimeBase_Data_Block dataBlockArray;       /*!< SD Card Time Base Data Buffer Array       */
 
+}LOOKE_SD_TimeBase_Data_Buffer_TEST_Union;
 
 typedef enum
 {
@@ -301,12 +307,11 @@ typedef enum
 ////////////////////////////////////////////////////////////////////////////////////////
 typedef enum
 {
-  LOOKE_SD_FILE_GLOBAL_CACHE_STATE_STOP          = ((uint32_t)0x00000000U),    /*!< Data Buffer is not in Sync Process and ready for Sync          */
-	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ARHS     = ((uint32_t)0x00000001U),    /*!< ARHS Data Buffer is in Sync Process and is writing data to SD Card  */
-	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_TIMEBASE = ((uint32_t)0x00000002U),    /*!< TIMEBASE Data Buffer is in Sync Process and is writing data to SD Card  */
-	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER      = ((uint32_t)0x00000003U),    /*!< Data Collection is stopped                                     */
-	
-	
+  LOOKE_SD_FILE_GLOBAL_CACHE_STATE_STOP                   = ((uint32_t)0x00000000U),    /*!< Data Buffer is not in Sync Process and ready for Sync          */
+	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ARHS              = ((uint32_t)0x00000001U),    /*!< ARHS Data Buffer is in Sync Process and is writing data to SD Card  */
+	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_TIMEBASE          = ((uint32_t)0x00000002U),    /*!< TIMEBASE Data Buffer is in Sync Process and is writing data to SD Card  */
+	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER               = ((uint32_t)0x00000003U),    /*!< Data Collection is stopped                                     */
+	LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ERROR             = ((uint32_t)0x00000004U),    /*!< Data Sync Process Error                                    */
 	
 }LOOKE_SD_FILE_GLOBAL_CACHE_STATE;
 
