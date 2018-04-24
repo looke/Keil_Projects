@@ -53,6 +53,10 @@
 #define TIMx_32bits                    TIM2
 #define TIMx_32bits_CLK_ENABLE()       __HAL_RCC_TIM2_CLK_ENABLE()
 
+#define TIMx_ARHS                      TIM3
+#define TIMx_ARHS_CLK_ENABLE()         __HAL_RCC_TIM3_CLK_ENABLE()
+
+
 /* Definition for SD Card clock resources */
 #define SD1_CLK_ENABLE()							 __HAL_RCC_SDMMC1_CLK_ENABLE()
 #define SD2_CLK_ENABLE()							 __HAL_RCC_SDMMC2_CLK_ENABLE()
@@ -61,9 +65,12 @@
 #define TIMx_32bits_IRQn               TIM2_IRQn
 #define TIMx_32bits_IRQHandler         TIM2_IRQHandler
 
+#define TIMx_ARHS_IRQn                 TIM3_IRQn
+#define TIMx_ARHS_IRQHandler           TIM3_IRQHandler
 
-//#define TIMx_Master_CHANNEL_GPIO_PORT() __GPIOB_CLK_ENABLE()
+//
 #define TIMx_32bits_CHANNEL_GPIO_PORT() __GPIOA_CLK_ENABLE()
+#define TIMx_ARHS_CHANNEL_GPIO_PORT()   __GPIOB_CLK_ENABLE()
 
 #define SDMMC1_GEN_GPIO_PORT()          __GPIOC_CLK_ENABLE()
 #define SDMMC1_CMD_GPIO_PORT()          __GPIOD_CLK_ENABLE()
