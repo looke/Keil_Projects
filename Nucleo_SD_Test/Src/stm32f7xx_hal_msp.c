@@ -127,6 +127,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
 	//SD1_CLK_ENABLE();
 	/* SDMMC2 Peripheral clock enable */
   SD2_CLK_ENABLE();
+	
 	/* DMA controller clock enable */
   __HAL_RCC_DMA2_CLK_ENABLE();
 	
@@ -151,6 +152,9 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Alternate = GPIO_AF_SDMMC1;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+	
+	HAL_NVIC_SetPriority(SDMMC1_IRQn, 3, 1);
+	HAL_NVIC_EnableIRQ(SDMMC1_IRQn);
 	*/
 	
 	// Configure SDMMC2 port in Alternate function, push-pull and 100MHz speed
@@ -165,7 +169,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Alternate = GPIO_AF_SDMMC2_CMD;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-	
+
 	HAL_NVIC_SetPriority(SDMMC2_IRQn, 3, 1);
 	HAL_NVIC_EnableIRQ(SDMMC2_IRQn);
 	
