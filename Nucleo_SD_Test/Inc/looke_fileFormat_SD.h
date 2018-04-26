@@ -200,8 +200,8 @@ HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOK
   */
 ////////////////////////////////////////////////////////////////////////////////////////
 #define LOOKE_SD_FILE_BLOCK_SIZE            512 /* Block Size in Bytes */
-#define LOOKE_SD_FILE_CACHE_SIZE            30  /* Cache Size in Block */
-
+//#define LOOKE_SD_FILE_CACHE_SIZE            30  /* Cache Size in Block */
+#define LOOKE_SD_FILE_CACHE_SIZE            20  /* Cache Size in Block */
 typedef union
 {
   uint8_t DataArray[LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE];       /*!< uint8_t data array for SD card transfer   */
