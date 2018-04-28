@@ -117,7 +117,7 @@ __align(4) LOOKE_SD_Global_Data_Cache SD_File_Cache;
 
 //__align(4) uint8_t aBuffer_Block_Tx_Write[LOOKE_SD_FILE_BLOCK_SIZE];
 __align(4) uint8_t aBuffer_Block_Rx[LOOKE_SD_FILE_BLOCK_SIZE];
-__align(4) uint8_t aBuffer_Block_Tx[LOOKE_SD_FILE_BLOCK_SIZE];
+__align(4) uint8_t aBuffer_Block_Tx[LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE];
 /* Prescaler declaration */
 __IO uint32_t uwPrescalerValue = 0;
 
@@ -133,6 +133,8 @@ LOOKE_SD_TimeBase_Data timeBaseDataTest;
 
 uint8_t i;
 
+uint8_t waitCounter4SDMMC;
+uint8_t startBlockIndex;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void Error_Handler(void);
@@ -175,7 +177,9 @@ int main(void)
   sizeTest = sizeof(LOOKE_SD_ARHS_Data_Cache);
 	sizeTest = sizeof(LOOKE_SD_TimeBase_Data_Cache);
 	
-	
+	waitCounter4SDMMC = 0x00;
+  startBlockIndex = 0x00;
+
   /* Configure the system clock to 216 MHz */
   SystemClock_Config();
 
@@ -192,7 +196,7 @@ int main(void)
 	
 	TimHandle_32bits.Instance = TIMx_32bits;
 	//TimHandle_32bits.Init.Period            = 0xFFFFFFFF;
-	TimHandle_32bits.Init.Period            = 120000-1; //100Sps
+	TimHandle_32bits.Init.Period            = 1200000-1; //10Sps / 100ms Period
 	//TimHandle_32bits.Init.Prescaler         = 26;	// 108Mhz/27 = 4Mhz
 	//TimHandle_32bits.Init.Prescaler         = 2;	// 108Mhz/3 = 36Mhz
 	TimHandle_32bits.Init.Prescaler         = 8;	// 108Mhz/9 = 12Mhz
@@ -348,27 +352,27 @@ int main(void)
 	//  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 	//}	
 	
-	/*
+	
 	uint16_t initForBuffer;
-	for(initForBuffer = 0 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE; initForBuffer++)
+	for(initForBuffer = 0 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE; initForBuffer++)
 	{
-		aBuffer_Block_Tx[initForBuffer] = 0x00;
+		aBuffer_Block_Tx[initForBuffer] = initForBuffer;
 	}
 	
-	uint8_t testValue = 0x01;
-	for(initForBuffer = 4 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE; )
-	{
-		aBuffer_Block_Tx[initForBuffer] = testValue;
-		initForBuffer = initForBuffer+4;
-		aBuffer_Block_Tx[initForBuffer] = testValue;
-		initForBuffer = initForBuffer+4;
-		testValue++;
-	}
-	aBuffer_Block_Tx[508] = 0x00;
-	aBuffer_Block_Tx[509] = 0x00;
-	aBuffer_Block_Tx[510] = 0x00;
-	aBuffer_Block_Tx[511] = 0x00;
-	
+	//uint8_t testValue = 0x01;
+	//for(initForBuffer = 4 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE; )
+	//{
+	//	aBuffer_Block_Tx[initForBuffer] = testValue;
+	//	initForBuffer = initForBuffer+4;
+	//	aBuffer_Block_Tx[initForBuffer] = testValue;
+	//	initForBuffer = initForBuffer+4;
+	//	testValue++;
+	//}
+	//aBuffer_Block_Tx[508] = 0x00;
+	//aBuffer_Block_Tx[509] = 0x00;
+	//aBuffer_Block_Tx[510] = 0x00;
+	//aBuffer_Block_Tx[511] = 0x00;
+	/*
 	SCB_CleanDCache();
 	
 	//startTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
@@ -379,6 +383,7 @@ int main(void)
 		//Error_Handler();
 	}
   */
+	
 	//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 	
 	
@@ -631,6 +636,7 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 {
 	//endTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
 	
+	/*
 	//After DMA TX Transfer, Switch State
 	if(SD_File_Cache.CurrentGlobalState == LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_TIMEBASE)
 	{
@@ -650,6 +656,8 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 	LOOKE_SD_File_WriteSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion);
 	
 	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
+	*/
+	
 }
 
 /**
@@ -659,6 +667,7 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+	/*
 	//Test SD File Cache
 	if(htim->Instance == TIMx_32bits)
 	{
@@ -675,6 +684,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		BSP_LED_Toggle(LED2);
 	}
+	
+	*/
+	
+	//Test DMA Write OP every 100ms
+	SCB_CleanDCache();
+
+	if(HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, 0x10, 1) == HAL_OK)
+	{
+	  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
+		//Error_Handler();
+	}
+	
 }
 
 
