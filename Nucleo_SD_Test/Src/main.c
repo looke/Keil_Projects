@@ -325,20 +325,27 @@ int main(void)
   //HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 2, 0);
   //HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 	
-  /*
+  
 	//Format SD File SYSPara
 	SD_FileSysParaUnion.FileSysPara.NumberOfMeasurementSection = 0;
 	SD_FileSysParaUnion.FileSysPara.SectionIndexArray[0].SectionStartBlock = 0;
 	SD_FileSysParaUnion.FileSysPara.SectionIndexArray[0].SectionEndBlock = 0;
-  LOOKE_SD_File_WriteSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion);
 	
-	LOOKE_SD_File_CreateMeasureSection(&SDHandle_SDMMC, &SD_FileSysParaUnion);
-	*/
+  if(LOOKE_SD_File_WriteSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion) != HAL_OK)
+	{
+	  Error_Handler();
+	}
+	
+	if(LOOKE_SD_File_CreateMeasureSection(&SDHandle_SDMMC, &SD_FileSysParaUnion) != HAL_OK)
+	{
+	  Error_Handler();
+	}
+	
 	
 	//Init SD File SYSPara
 	if(LOOKE_SD_File_ReadSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion) != HAL_OK)
 	{
-	  BSP_LED_Toggle(LED3);
+	  BSP_LED_Toggle(LED2);
 	}
 	
 	
@@ -591,8 +598,8 @@ void SystemClock_Config(void)
   */
 static void Error_Handler(void)
 {
-  /* Turn LED3 on */
-  BSP_LED_On(LED3);
+  /* Turn LED2 on */
+  BSP_LED_On(LED2);
   while (1)
   {
   }

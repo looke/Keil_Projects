@@ -80,13 +80,19 @@ HAL_StatusTypeDef LOOKE_SD_File_ReadSysPara(SD_HandleTypeDef *hsd, LOOKE_SD_File
   */
 HAL_StatusTypeDef LOOKE_SD_File_WriteSysPara(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para_Union *pSysParaUnion)
 {
+	uint8_t waitCounter = 0;
 	
-	if(HAL_SD_GetCardState(hsd) != HAL_SD_CARD_TRANSFER)
+	while (waitCounter < 0xFF)
 	{
-		return HAL_BUSY;
+	  if(HAL_SD_GetCardState(hsd) == HAL_SD_CARD_TRANSFER)
+	  {
+		  return HAL_SD_WriteBlocks(hsd, pSysParaUnion->DataArray, 0x00, 1, 0x0F);
+			
+	  }
+    waitCounter++;
 	}
-	
-  return HAL_SD_WriteBlocks(hsd, pSysParaUnion->DataArray, 0x00, 1, 0x0F);
+
+	return HAL_BUSY;
 };
 
 /**
@@ -97,6 +103,7 @@ HAL_StatusTypeDef LOOKE_SD_File_WriteSysPara(SD_HandleTypeDef *hsd, LOOKE_SD_Fil
   */
 HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para_Union* pFileSysPara)
 {
+	uint8_t waitCounter;
 	uint32_t newMeasureSectionBlockIndex = 1;
 	
 	uint32_t measureSectionNum = pFileSysPara->FileSysPara.NumberOfMeasurementSection;
@@ -117,18 +124,49 @@ HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOK
 	}
 	
 	//Write New Measure Section Parameters to SD Card
+	waitCounter = 0;
+	while (waitCounter < 0xFF)
+	{
+		if(HAL_SD_GetCardState(hsd) != HAL_SD_CARD_TRANSFER)
+	  {
+	    waitCounter++;
+	  }
+		else
+		{
+			break;
+		}
+	}
+	
+	if(waitCounter >= 0xFF)
+	{
+	  return HAL_BUSY;
+	}
+	
 	if(HAL_SD_WriteBlocks(hsd, newSectionParaUnion.DataArray, newMeasureSectionBlockIndex, 1, 0x0FF) != HAL_OK )
 	{
 		return HAL_ERROR;
 	}
-	
+			
 	pFileSysPara->FileSysPara.NumberOfMeasurementSection = measureSectionNum + 1;
 	pFileSysPara->FileSysPara.SectionIndexArray[measureSectionNum].SectionStartBlock = newMeasureSectionBlockIndex;
 	pFileSysPara->FileSysPara.SectionIndexArray[measureSectionNum].SectionEndBlock = newMeasureSectionBlockIndex;
 	
-	if(HAL_SD_GetCardState(hsd) != HAL_SD_CARD_TRANSFER)
+	waitCounter = 0;
+	while (waitCounter < 0xFF)
 	{
-		return HAL_BUSY;
+		if(HAL_SD_GetCardState(hsd) != HAL_SD_CARD_TRANSFER)
+	  {
+	    waitCounter++;
+	  }
+		else
+		{
+			break;
+		}
+	}
+	
+	if(waitCounter >= 0xFF)
+	{
+	  return HAL_BUSY;
 	}
 	
 	//Write New File System Parameters to SD Card
