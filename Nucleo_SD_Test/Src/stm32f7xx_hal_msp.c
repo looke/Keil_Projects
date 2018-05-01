@@ -75,7 +75,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 	
   /*##-2- Configure the NVIC for TIMx ########################################*/
   /* Set the TIMx priority */
-  HAL_NVIC_SetPriority(TIMx_32bits_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(TIMx_32bits_IRQn, 3, 0);
   HAL_NVIC_SetPriority(TIMx_ARHS_IRQn, 3, 0);
 	
   /* Enable the TIMx global Interrupt */
@@ -170,7 +170,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
 	GPIO_InitStruct.Alternate = GPIO_AF_SDMMC2_CMD;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-	HAL_NVIC_SetPriority(SDMMC2_IRQn, 3, 1);
+	HAL_NVIC_SetPriority(SDMMC2_IRQn, 2, 0);
 	HAL_NVIC_EnableIRQ(SDMMC2_IRQn);
 	
 
