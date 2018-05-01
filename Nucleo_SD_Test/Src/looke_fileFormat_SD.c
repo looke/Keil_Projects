@@ -103,7 +103,7 @@ HAL_StatusTypeDef LOOKE_SD_File_WriteSysPara(SD_HandleTypeDef *hsd, LOOKE_SD_Fil
   */
 HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOKE_SD_FileSys_Para_Union* pFileSysPara)
 {
-	uint8_t waitCounter;
+	uint16_t waitCounter;
 	uint32_t newMeasureSectionBlockIndex = 1;
 	
 	uint32_t measureSectionNum = pFileSysPara->FileSysPara.NumberOfMeasurementSection;
@@ -118,14 +118,14 @@ HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOK
 	newSectionParaUnion.MeasureSectionPara.NumberOfAHRSDataBlock = 0;
 	newSectionParaUnion.MeasureSectionPara.NumberOfTimeBaseDataBlock = 0;
 	
-	if(HAL_SD_GetCardState(hsd) != HAL_SD_CARD_TRANSFER)
-	{
-		return HAL_BUSY;
-	}
+	//if(HAL_SD_GetCardState(hsd) != HAL_SD_CARD_TRANSFER)
+	//{
+	//	return HAL_BUSY;
+	//}
 	
 	//Write New Measure Section Parameters to SD Card
 	waitCounter = 0;
-	while (waitCounter < 0xFF)
+	while (waitCounter < 0xFFFF)
 	{
 		if(HAL_SD_GetCardState(hsd) != HAL_SD_CARD_TRANSFER)
 	  {
@@ -137,7 +137,7 @@ HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOK
 		}
 	}
 	
-	if(waitCounter >= 0xFF)
+	if(waitCounter >= 0xFFFF)
 	{
 	  return HAL_BUSY;
 	}
@@ -152,7 +152,7 @@ HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOK
 	pFileSysPara->FileSysPara.SectionIndexArray[measureSectionNum].SectionEndBlock = newMeasureSectionBlockIndex;
 	
 	waitCounter = 0;
-	while (waitCounter < 0xFF)
+	while (waitCounter < 0xFFFF)
 	{
 		if(HAL_SD_GetCardState(hsd) != HAL_SD_CARD_TRANSFER)
 	  {
@@ -164,7 +164,7 @@ HAL_StatusTypeDef LOOKE_SD_File_CreateMeasureSection(SD_HandleTypeDef *hsd, LOOK
 		}
 	}
 	
-	if(waitCounter >= 0xFF)
+	if(waitCounter >= 0xFFFF)
 	{
 	  return HAL_BUSY;
 	}
