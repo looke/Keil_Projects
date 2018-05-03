@@ -136,16 +136,21 @@ uint8_t i;
 uint16_t waitCounter4SDMMC;
 uint32_t startBlockIndex;
 uint32_t timerCounter;
-uint32_t DMAErrorCounter;
+uint32_t SDTransErrorCounter;
+uint32_t DMASendErrorCounter;
+uint32_t DMATransErrorCounter;
 uint32_t waitErrorCounter;
-
+uint32_t missOutCounter;
+uint32_t EraseError;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void Error_Handler(void);
 static void CPU_CACHE_Enable(void);
+void LOOKE_SD_DMA_XferError(DMA_HandleTypeDef *hdma);
 
 /* Private functions ---------------------------------------------------------*/
 void DelaySomeTime(void);
+void DelayShortTime(void);
 /**
   * @brief  Main program
   * @param  None
@@ -182,11 +187,14 @@ int main(void)
 	sizeTest = sizeof(LOOKE_SD_TimeBase_Data_Cache);
 	
 	waitCounter4SDMMC = 0x00000000;
-  startBlockIndex = 0;
+  startBlockIndex = 0x00010000;
   timerCounter = 0;
-	DMAErrorCounter = 0;
+	SDTransErrorCounter = 0;
+	DMASendErrorCounter = 0;
+	DMATransErrorCounter = 0;
 	waitErrorCounter = 0;
-	
+	missOutCounter = 0;
+	EraseError = 0;
   /* Configure the system clock to 216 MHz */
   SystemClock_Config();
 
@@ -227,17 +235,21 @@ int main(void)
   TimHandle_ARHS.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
 
   /*##-1- Configure the SD peripheral #######################################*/
-  SDHandle_SDMMC.Instance = SDMMC2;
+  SDHandle_SDMMC.Instance = SDMMC1;
 	SDHandle_SDMMC.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
   SDHandle_SDMMC.Init.ClockBypass = SDMMC_CLOCK_BYPASS_DISABLE;
 	//SDHandle_SDMMC.Init.ClockBypass = SDMMC_CLOCK_BYPASS_ENABLE;
   SDHandle_SDMMC.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
   SDHandle_SDMMC.Init.BusWide = SDMMC_BUS_WIDE_1B;
-	SDHandle_SDMMC.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
-  SDHandle_SDMMC.Init.ClockDiv = 0; //24Mhz
+	//SDHandle_SDMMC.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
+	SDHandle_SDMMC.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
+  //SDHandle_SDMMC.Init.ClockDiv = 0; //24Mhz
   //SDHandle_SDMMC.Init.ClockDiv = 1; //12Mhz
 	//SDHandle_SDMMC.Init.ClockDiv = 2; //8Mhz
-	
+	//SDHandle_SDMMC.Init.ClockDiv = 3; //6Mhz
+	//SDHandle_SDMMC.Init.ClockDiv = 4; //4.8Mhz
+	//SDHandle_SDMMC.Init.ClockDiv = 5; //4Mhz for Sony C4
+	SDHandle_SDMMC.Init.ClockDiv = 7; //3Mhz for Kingston C4
 	if (HAL_SD_Init(&SDHandle_SDMMC) != HAL_OK)
   {
     Error_Handler();
@@ -247,22 +259,27 @@ int main(void)
 	{
 		Error_Handler();
 	}
-
+  DelaySomeTime();
   if (HAL_SD_GetCardInfo(&SDHandle_SDMMC, &SDCardInfo) != HAL_OK)
 	{
 		Error_Handler();
 	}
-	
+	DelaySomeTime();
 	if (HAL_SD_GetCardCSD(&SDHandle_SDMMC, &SDCardCSDInfo) != HAL_OK)
 	{
 		Error_Handler();
 	}
-	
+	DelaySomeTime();
 	if (HAL_SD_GetCardCID(&SDHandle_SDMMC, &SDCardCIDInfo) != HAL_OK)
 	{
 		Error_Handler();
 	}
-	
+	//DelaySomeTime();
+	//Erase SD Card Block
+	//if (HAL_SD_Erase(&SDHandle_SDMMC,0x00000000,0x00FFFFFF) != HAL_OK)
+	//{
+	//  Error_Handler();
+	//}
 	/* Configure the SD DPSM (Data Path State Machine) */ 
 	//SDMMC_DataInitTypeDef config;
   //config.DataTimeOut   = SDMMC_DATATIMEOUT;
@@ -273,20 +290,21 @@ int main(void)
   //config.DPSM          = SDMMC_DPSM_ENABLE;
   //SDMMC_ConfigData(SDHandle_SDMMC1.Instance, &config);
 	//errorstate = SDMMC_CmdBlockLength(SDHandle_SDMMC1.Instance, 64);
-	
+	DelaySomeTime();
+	DelaySomeTime();
   if (HAL_SD_GetCardStatus(&SDHandle_SDMMC, &SDCardStatus) != HAL_OK)
 	{
 		Error_Handler();
 	}
 	
 	//Config DMA Channel for SDMMC2
-	hdma_sdmmc.Instance = DMA2_Stream5;
-	hdma_sdmmc.Init.Channel = DMA_CHANNEL_11;
+	//hdma_sdmmc.Instance = DMA2_Stream5;
+	//hdma_sdmmc.Init.Channel = DMA_CHANNEL_11;
 
 	//Config DMA Channel for SDMMC1
-	//hdma_sdmmc.Instance = DMA2_Stream6;
+	hdma_sdmmc.Instance = DMA2_Stream6;
   //hdma_sdmmc.Instance = DMA2_Stream3;
-	//hdma_sdmmc.Init.Channel = DMA_CHANNEL_4;
+	hdma_sdmmc.Init.Channel = DMA_CHANNEL_4;
 	
 	//DMA read process DMA_PERIPH_TO_MEMORY
 	//hdma_sdmmc.Init.Direction = DMA_PERIPH_TO_MEMORY;
@@ -315,8 +333,10 @@ int main(void)
 	if (HAL_DMA_Init(&hdma_sdmmc) != HAL_OK)
   {
     Error_Handler();
-  }
+	}
 	
+	hdma_sdmmc.XferErrorCallback = LOOKE_SD_DMA_XferError;
+  
 	//DMA Read Link
 	//__HAL_LINKDMA(&SDHandle_SDMMC,hdmarx,hdma_sdmmc);
 	
@@ -325,12 +345,12 @@ int main(void)
 
 	/* DMA interrupt init */
   /* DMA2_Channel11_5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 3, 1);
-  HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
+  //HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 3, 1);
+  //HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
 	
 	/* DMA2_Channel4_6_IRQn interrupt configuration */
-  //HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 3, 1);
-  //HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+  HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 3, 1);
+  HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
 	
   
 	//Format SD File SYSPara
@@ -347,7 +367,7 @@ int main(void)
 	{
 	  Error_Handler();
 	}
-	
+	DelaySomeTime();
 	//Init SD File SYSPara
 	if(LOOKE_SD_File_ReadSysPara(&SDHandle_SDMMC, &SD_FileSysParaUnion) != HAL_OK)
 	{
@@ -531,6 +551,32 @@ int main(void)
 		
 		//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 		//BSP_LED_Toggle(LED3);
+		/*
+		if(waitErrorCounter > 0)
+		{
+			//restart SDMMC
+			if(HAL_SD_DeInit(&SDHandle_SDMMC) == HAL_OK)
+			{
+        SDHandle_SDMMC.Instance = SDMMC2;
+	      SDHandle_SDMMC.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
+        SDHandle_SDMMC.Init.ClockBypass = SDMMC_CLOCK_BYPASS_DISABLE;
+        SDHandle_SDMMC.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
+        SDHandle_SDMMC.Init.BusWide = SDMMC_BUS_WIDE_1B;
+	      SDHandle_SDMMC.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
+        SDHandle_SDMMC.Init.ClockDiv = 0; //24Mhz
+				
+			  if (HAL_SD_Init(&SDHandle_SDMMC) == HAL_OK)
+        {
+				  DelaySomeTime();
+					
+					if (HAL_SD_ConfigWideBusOperation(&SDHandle_SDMMC, SDMMC_BUS_WIDE_4B) == HAL_OK )
+	        {
+		        waitErrorCounter = 0;
+	        }
+				}
+			}
+		}
+		*/
   }
 }
 
@@ -630,8 +676,8 @@ void HAL_SD_ErrorCallback(SD_HandleTypeDef *hsd)
 	uint32_t error = hsd->hdmatx->ErrorCode;
 	
 	//SD TX Transfer ERROR,Switch SD Cache Global State
-	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ERROR;
-	DMAErrorCounter++;
+	//SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_SYNC_ERROR;
+	SDTransErrorCounter++;
 }
 
 
@@ -643,6 +689,15 @@ void DelaySomeTime(void)
    {
       i=0xFF;
       while(i--);
+   }
+}
+
+void DelayShortTime(void)
+{
+	 uint16_t time=0x00FF;
+   while(time--)
+   {
+
    }
 }
 
@@ -671,8 +726,33 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 	
 	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
 	*/
-	startBlockIndex += LOOKE_SD_FILE_CACHE_SIZE;
+	
+	
+  uint16_t waitCounter = 0x0000;
+	while (waitCounter < 0xFFFF)
+	{
+		if(HAL_SD_GetCardState(&SDHandle_SDMMC) == HAL_SD_CARD_TRANSFER)
+		{
+			startBlockIndex += LOOKE_SD_FILE_CACHE_SIZE;
+			waitCounter4SDMMC = waitCounter;
+			return;
+		}
+		waitCounter++;
+		DelayShortTime();
+	}
+	waitErrorCounter++;
 }
+
+/**
+  * @brief  DMA Error Callback for SD card DMA Transfer
+  * @param  hdma : DMA handle
+  * @retval None
+  */
+void LOOKE_SD_DMA_XferError(DMA_HandleTypeDef *hdma)
+{
+  DMATransErrorCounter++;
+}
+	
 
 /**
   * @brief  Period elapsed callback in non blocking mode
@@ -704,24 +784,24 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	//Test DMA Write OP every 100ms
 	timerCounter++;
 	SCB_CleanDCache();
-	uint16_t waitCounter = 0x0000;
-	while (waitCounter < 0xFFFF)
-	{
+	//uint16_t waitCounter = 0x0000;
+	//while (waitCounter < 0xFFFF)
+	//{
 		if(HAL_SD_GetCardState(&SDHandle_SDMMC) == HAL_SD_CARD_TRANSFER)
 		{
-			if(waitCounter > waitCounter4SDMMC)
-			{
-			  waitCounter4SDMMC = waitCounter;
-			}
+			//if(waitCounter > waitCounter4SDMMC)
+			//{
+			//  waitCounter4SDMMC = waitCounter;
+			//}
 	    //DMA Write Link
 			//Config DMA Channel for SDMMC2
-	    hdma_sdmmc.Instance = DMA2_Stream5;
-	    hdma_sdmmc.Init.Channel = DMA_CHANNEL_11;
+	    //hdma_sdmmc.Instance = DMA2_Stream5;
+	    //hdma_sdmmc.Init.Channel = DMA_CHANNEL_11;
 
 	    //Config DMA Channel for SDMMC1
-	    //hdma_sdmmc.Instance = DMA2_Stream6;
+	    hdma_sdmmc.Instance = DMA2_Stream6;
       //hdma_sdmmc.Instance = DMA2_Stream3;
-	    //hdma_sdmmc.Init.Channel = DMA_CHANNEL_4;
+	    hdma_sdmmc.Init.Channel = DMA_CHANNEL_4;
 	
 	    //DMA read process DMA_PERIPH_TO_MEMORY
 	    //hdma_sdmmc.Init.Direction = DMA_PERIPH_TO_MEMORY;
@@ -753,24 +833,32 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       }
 			/* DMA interrupt init */
       /* DMA2_Channel11_5_IRQn interrupt configuration */
-			HAL_NVIC_DisableIRQ(DMA2_Stream5_IRQn);
-      HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 3, 1);
-      HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
+			HAL_NVIC_DisableIRQ(DMA2_Stream6_IRQn);
+      HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 3, 1);
+      HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
 			
 	    __HAL_LINKDMA(&SDHandle_SDMMC,hdmatx,hdma_sdmmc);
-		  if(HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, startBlockIndex, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK)
+			//if( HAL_SD_Erase(&SDHandle_SDMMC,startBlockIndex,startBlockIndex+LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK )
+			//{
+			//  EraseError++;
+			//}
+		  if( HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, startBlockIndex, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK )
 	    {
-	      DMAErrorCounter++;
+	      DMASendErrorCounter++;
 	    }
 			return;
 		}
-    waitCounter++;
-	}
-	if(waitCounter > waitCounter4SDMMC)
-	{
-		waitCounter4SDMMC = waitCounter;
-	}
-	waitErrorCounter++;
+		else
+		{
+		  missOutCounter++;
+		}
+    //waitCounter++;
+	//}
+	//if(waitCounter > waitCounter4SDMMC)
+	//{
+	//	waitCounter4SDMMC = waitCounter;
+	//}
+	//waitErrorCounter++;
 }
 
 
