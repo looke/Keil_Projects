@@ -220,31 +220,31 @@ void TIMx_ARHS_IRQHandler(void)
   * @param  None
   * @retval None
   */
-//void SDMMC1_IRQHandler(void)
-//{
-//  HAL_SD_IRQHandler(&SDHandle_SDMMC);
-//}
+void SDMMC1_IRQHandler(void)
+{
+  HAL_SD_IRQHandler(&SDHandle_SDMMC);
+}
 
 /**
   * @brief  This function handles SDMMC2 interrupt request.
   * @param  None
   * @retval None
   */
-void SDMMC2_IRQHandler(void)
-{
-  HAL_SD_IRQHandler(&SDHandle_SDMMC);
-}
+//void SDMMC2_IRQHandler(void)
+//{
+//  HAL_SD_IRQHandler(&SDHandle_SDMMC);
+//}
 
 
-void DMA2_Stream5_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(&hdma_sdmmc);
-}
-
-//void DMA2_Stream3_IRQHandler(void)
+//void DMA2_Stream5_IRQHandler(void)
 //{
 //	HAL_DMA_IRQHandler(&hdma_sdmmc);
 //}
+
+void DMA2_Stream6_IRQHandler(void)
+{
+	HAL_DMA_IRQHandler(&hdma_sdmmc);
+}
 
 /**
   * @}
