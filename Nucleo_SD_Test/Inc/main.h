@@ -61,6 +61,9 @@
 #define SD1_CLK_ENABLE()							 __HAL_RCC_SDMMC1_CLK_ENABLE()
 #define SD2_CLK_ENABLE()							 __HAL_RCC_SDMMC2_CLK_ENABLE()
 
+#define SD1_CLK_DISABLE()              __HAL_RCC_SDMMC1_CLK_DISABLE()
+#define SD2_CLK_DISABLE()              __HAL_RCC_SDMMC2_CLK_DISABLE()
+
 /* Definition for TIMx's NVIC */
 #define TIMx_32bits_IRQn               TIM2_IRQn
 #define TIMx_32bits_IRQHandler         TIM2_IRQHandler
@@ -74,6 +77,8 @@
 
 #define SDMMC1_GEN_GPIO_PORT()          __GPIOC_CLK_ENABLE()
 #define SDMMC1_CMD_GPIO_PORT()          __GPIOD_CLK_ENABLE()
+#define SDMMC1_GEN_GPIO_PORT_OFF()      __GPIOC_CLK_DISABLE()
+#define SDMMC1_CMD_GPIO_PORT_OFF()      __GPIOD_CLK_DISABLE()
 
 #define SDMMC2_GEN_GPIO_D0_D4_PORT()    __GPIOB_CLK_ENABLE()
 #define SDMMC2_CMD_GPIO_PORT()          __GPIOD_CLK_ENABLE()
