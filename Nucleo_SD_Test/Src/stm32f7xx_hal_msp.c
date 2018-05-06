@@ -112,7 +112,7 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim)
 	
 	 /*##-2- Configure the NVIC for TIMx ########################################*/
   /* Set the TIMx priority */
-	HAL_NVIC_SetPriority(TIMx_32bits_IRQn, 4, 0);
+	HAL_NVIC_SetPriority(TIMx_32bits_IRQn, 5, 0);
 	
 	/* Enable the TIMx global Interrupt */
 	HAL_NVIC_EnableIRQ(TIMx_32bits_IRQn);
@@ -177,6 +177,20 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
 
 }
 
+void HAL_SD_MspDeInit(SD_HandleTypeDef *hsd)
+{
+	/* SDMMC1 Peripheral clock disable */
+	SD1_CLK_DISABLE();
+	
+	HAL_GPIO_DeInit(GPIOC, SDMMC1_D0 | SDMMC1_D1 | SDMMC1_D2 | SDMMC1_D3 | SDMMC1_CK);
+  HAL_GPIO_DeInit(GPIOD, SDMMC1_CMD);
+	
+	SDMMC1_GEN_GPIO_PORT_OFF();
+	SDMMC1_CMD_GPIO_PORT_OFF();
+	
+	HAL_NVIC_DisableIRQ(SDMMC1_IRQn);
+}
+	 
 /**
   * @}
   */
