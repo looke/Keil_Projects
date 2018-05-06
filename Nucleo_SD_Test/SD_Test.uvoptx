@@ -149,9 +149,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>529</LineNumber>
+          <LineNumber>287</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134226084</Address>
+          <Address>134233328</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -160,14 +160,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Src\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\SD_Test\Src/main.c\529</Expression>
+          <Expression>\\SD_Test\Src/main.c\287</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>194</LineNumber>
+          <LineNumber>882</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134230632</Address>
+          <Address>134227976</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -176,23 +176,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Src\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\SD_Test\Src/main.c\194</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>223</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134226362</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Src\stm32f7xx_it.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\SD_Test\Src/stm32f7xx_it.c\223</Expression>
+          <Expression>\\SD_Test\Src/main.c\882</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -219,7 +203,7 @@
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>GPIO_Init</ItemText>
+          <ItemText>SDHandle_SDMMC</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
@@ -239,7 +223,7 @@
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>hsd-&gt;Instance-&gt;RESP4</ItemText>
+          <ItemText>LOOKE_SD_FILE_CACHE_SIZE</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
@@ -389,7 +373,67 @@
         <Ww>
           <count>38</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pSysParaUnion</ItemText>
+          <ItemText>SD_FileSysParaUnion</ItemText>
+        </Ww>
+        <Ww>
+          <count>39</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>waitCounter4SDMMC</ItemText>
+        </Ww>
+        <Ww>
+          <count>40</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>startBlockIndex</ItemText>
+        </Ww>
+        <Ww>
+          <count>41</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>timerCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>42</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>DMASendErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>43</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>waitErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>44</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>missOutCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>45</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>EraseError</ItemText>
+        </Ww>
+        <Ww>
+          <count>46</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>DMATransErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>47</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>SDTransErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>48</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>whileInSDCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>49</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>whileCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>50</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>GLOBAL_SDTRANSFER_SWITCH</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
