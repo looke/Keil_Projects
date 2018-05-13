@@ -110,7 +110,7 @@
 #define SDMMC2_CMD           GPIO_PIN_7   //PD7
 
 
-//#define TEST_LIMIT 						600
+#define ERROR_BLOCKINDEX_LIMIT 	10
 
 /* Exported functions ------------------------------------------------------- */
 
