@@ -149,9 +149,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>287</LineNumber>
+          <LineNumber>570</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134233328</Address>
+          <Address>134231978</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -160,14 +160,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Src\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\SD_Test\Src/main.c\287</Expression>
+          <Expression>\\SD_Test\Src/main.c\570</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>882</LineNumber>
+          <LineNumber>307</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134227976</Address>
+          <Address>134231760</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -176,7 +176,23 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Src\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\SD_Test\Src/main.c\882</Expression>
+          <Expression>\\SD_Test\Src/main.c\307</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>1435</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134224936</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_sd.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\SD_Test\D:/DevelopProgramFiles/Keil_v5/ARM/PACK/Keil/STM32F7xx_DFP/2.9.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sd.c\1435</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -393,27 +409,27 @@
         <Ww>
           <count>42</count>
           <WinNumber>1</WinNumber>
-          <ItemText>DMASendErrorCounter</ItemText>
+          <ItemText>whileInSDCounter</ItemText>
         </Ww>
         <Ww>
           <count>43</count>
           <WinNumber>1</WinNumber>
-          <ItemText>waitErrorCounter</ItemText>
+          <ItemText>whileCounter</ItemText>
         </Ww>
         <Ww>
           <count>44</count>
           <WinNumber>1</WinNumber>
-          <ItemText>missOutCounter</ItemText>
+          <ItemText>GLOBAL_SDTRANSFER_SWITCH</ItemText>
         </Ww>
         <Ww>
           <count>45</count>
           <WinNumber>1</WinNumber>
-          <ItemText>EraseError</ItemText>
+          <ItemText>count</ItemText>
         </Ww>
         <Ww>
           <count>46</count>
           <WinNumber>1</WinNumber>
-          <ItemText>DMATransErrorCounter</ItemText>
+          <ItemText>TotalERRORCounter</ItemText>
         </Ww>
         <Ww>
           <count>47</count>
@@ -423,17 +439,47 @@
         <Ww>
           <count>48</count>
           <WinNumber>1</WinNumber>
-          <ItemText>whileInSDCounter</ItemText>
+          <ItemText>FIFOErrorCounter</ItemText>
         </Ww>
         <Ww>
           <count>49</count>
           <WinNumber>1</WinNumber>
-          <ItemText>whileCounter</ItemText>
+          <ItemText>DMEErrorCounter</ItemText>
         </Ww>
         <Ww>
           <count>50</count>
           <WinNumber>1</WinNumber>
-          <ItemText>GLOBAL_SDTRANSFER_SWITCH</ItemText>
+          <ItemText>TIMEOUTErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>51</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>PARAMErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>52</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>NOXFERErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>53</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>NOTSUPPErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>54</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>DMASendErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>55</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>waitErrorCounter</ItemText>
+        </Ww>
+        <Ww>
+          <count>56</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>missOutCounter</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
