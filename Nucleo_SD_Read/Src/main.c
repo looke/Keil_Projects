@@ -104,7 +104,7 @@ __align(8) uint8_t align[16];
 __align(8) uint8_t aBuffer_Block_Check[BLOCK_SIZE*CACHE_SIZE];
 __align(8) uint8_t aBuffer_Block_Rx[BLOCK_SIZE*CACHE_SIZE];
 __align(8) uint8_t aBuffer_Block_Rx2[BLOCK_SIZE*CACHE_SIZE];
-//__align(8) uint8_t aBuffer_Block_Tx[BLOCK_SIZE*CACHE_SIZE];
+__align(8) uint8_t aBuffer_Block_Tx[BLOCK_SIZE*CACHE_SIZE];
 
 //uint8_t aBuffer_Block_Rx[BLOCK_SIZE];
 //uint8_t aBuffer_Block_Tx[BLOCK_SIZE];
@@ -209,9 +209,9 @@ int main(void)
 	hdma_sdmmc.Init.Channel = DMA_CHANNEL_11;
 	
 	//DMA read process DMA_PERIPH_TO_MEMORY
-	hdma_sdmmc.Init.Direction = DMA_PERIPH_TO_MEMORY;
+	//hdma_sdmmc.Init.Direction = DMA_PERIPH_TO_MEMORY;
 	//DMA write process DMA_MEMORY_TO_PERIPH
-	//hdma_sdmmc.Init.Direction = DMA_MEMORY_TO_PERIPH;
+	hdma_sdmmc.Init.Direction = DMA_MEMORY_TO_PERIPH;
 	
   hdma_sdmmc.Init.PeriphInc = DMA_PINC_DISABLE;
   hdma_sdmmc.Init.MemInc = DMA_MINC_ENABLE;
@@ -224,7 +224,8 @@ int main(void)
 	//hdma_sdmmc.Init.Mode = DMA_NORMAL;
 	
   hdma_sdmmc.Init.Priority = DMA_PRIORITY_VERY_HIGH;
-	hdma_sdmmc.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+	//hdma_sdmmc.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+	hdma_sdmmc.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
 	hdma_sdmmc.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
 	hdma_sdmmc.Init.MemBurst = DMA_MBURST_INC4;
 	hdma_sdmmc.Init.PeriphBurst = DMA_PBURST_INC4;
@@ -234,10 +235,10 @@ int main(void)
     Error_Handler();
   }
 	//DMA Read hdmarx
-	__HAL_LINKDMA(&SDHandle_SDMMC,hdmarx,hdma_sdmmc);
+	//__HAL_LINKDMA(&SDHandle_SDMMC,hdmarx,hdma_sdmmc);
 	
 	//DMA Write hdmatx
-	//__HAL_LINKDMA(&SDHandle_SDMMC1,hdmatx,hdma_sdmmc);
+	__HAL_LINKDMA(&SDHandle_SDMMC,hdmatx,hdma_sdmmc);
 
 	/* DMA interrupt init */
   /* DMA2_Channel4_5_IRQn interrupt configuration */
@@ -250,32 +251,32 @@ int main(void)
 	//	Error_Handler();
 	//}
 	
-	if(HAL_SD_ReadBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Rx, 0x1A, CACHE_SIZE) != HAL_OK)
-	{
-	  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
-		//Error_Handler();
-	}
-	
-	SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
-	
-	SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
-	
-	if (HAL_SD_ReadBlocks(&SDHandle_SDMMC, aBuffer_Block_Rx2, 0x00, 1, 0xFFF) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	
-	
-	//for(initForBuffer = 0 ; initForBuffer<BLOCK_SIZE*CACHE_SIZE; initForBuffer++)
+	//if(HAL_SD_ReadBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Rx, 0x1A, CACHE_SIZE) != HAL_OK)
 	//{
-	//	aBuffer_Block_Tx[initForBuffer] = initForBuffer;
+	//  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
+		//Error_Handler();
 	//}
 	
-	//if(HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC1, aBuffer_Block_Tx, 0x00, CACHE_SIZE) != HAL_OK)
+	//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
+	
+	//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
+	
+	//if (HAL_SD_ReadBlocks(&SDHandle_SDMMC, aBuffer_Block_Rx2, 0x00, 1, 0xFFF) != HAL_OK)
 	//{
-	  //SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC1);
 	//	Error_Handler();
 	//}
+	
+	
+  for(initForBuffer = 0 ; initForBuffer<BLOCK_SIZE*CACHE_SIZE; initForBuffer++)
+	{
+		aBuffer_Block_Tx[initForBuffer] = initForBuffer;
+	}
+	
+	if(HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, 0x00, CACHE_SIZE) != HAL_OK)
+	{
+	  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
+		Error_Handler();
+	}
 	
   //if (HAL_SD_WriteBlocks(&SDHandle_SDMMC1, aBuffer_Block_Tx, 0x01, 0x01, 0x0F) != HAL_OK)
   //{
@@ -313,7 +314,7 @@ int main(void)
 		BSP_LED_Toggle(LED1);
 		DelaySomeTime();
 		DelaySomeTime();
-		
+		SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 		//int16_t i = 0;
 	  //for( ; i<BLOCK_SIZE; i++)
 	  //{
