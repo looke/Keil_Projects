@@ -334,7 +334,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F767xx,USE_STM32F7XX_NUCLEO_144</Define>
               <Undefine></Undefine>
-              <IncludePath>D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Include;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\STM32F7xx_HAL_Driver\Inc;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\BSP\STM32F7xx_Nucleo_144;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\BSP\Components\Common;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Utilities\Log;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Utilities\Fonts;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Utilities\CPU;.\Inc</IncludePath>
+              <IncludePath>D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Include;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\STM32F7xx_HAL_Driver\Inc;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\BSP\STM32F7xx_Nucleo_144;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\BSP\Components\Common;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Utilities\Log;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Utilities\Fonts;D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Utilities\CPU;.\Inc;..\SPILibForSensor</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -395,7 +395,7 @@
             <File>
               <FileName>MPU9250.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Inc\MPU9250.h</FilePath>
+              <FilePath>..\SPILibForSensor\MPU9250.h</FilePath>
             </File>
           </Files>
         </Group>

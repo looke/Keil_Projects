@@ -383,7 +383,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\Inc\MPU9250.h</PathWithFileName>
+      <PathWithFileName>..\SPILibForSensor\MPU9250.h</PathWithFileName>
       <FilenameWithoutPath>MPU9250.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -456,7 +456,7 @@
 
   <Group>
     <GroupName>Drivers/BSP/STM32F767ZI-Nucleo</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
