@@ -151,7 +151,7 @@
           <Type>0</Type>
           <LineNumber>299</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134222752</Address>
+          <Address>134224110</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -161,22 +161,6 @@
           <Filename>.\Src\main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\Tim_Test\Src/main.c\299</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>423</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134220836</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Src\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Tim_Test\Src/main.c\423</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
