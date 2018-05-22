@@ -76,7 +76,8 @@
 #define GPIO_PIN_TIMx_Master_CHANNEL_1      GPIO_PIN_4
 #define GPIO_PIN_TIMx_Slave_CHANNEL_1       GPIO_PIN_6
 
-#define GPIO_PIN_TIMx_32bits_CHANNEL_1       GPIO_PIN_5
+//#define GPIO_PIN_TIMx_32bits_CHANNEL_1       GPIO_PIN_5
+#define GPIO_PIN_TIMx_32bits_CHANNEL_1       GPIO_PIN_15
 
 #define GPIO_AF_TIMx_Master            GPIO_AF2_TIM3
 #define GPIO_AF_TIMx_Slave             GPIO_AF2_TIM4
