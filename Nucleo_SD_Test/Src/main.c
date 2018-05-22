@@ -399,12 +399,12 @@ int main(void)
 
 	/* DMA interrupt init */
   /* DMA2_Channel11_5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 0, 1);
-  HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
+  //HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 0, 1);
+  //HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
 	
-	/* DMA2_Channel4_6_IRQn interrupt configuration */
-  //HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 3, 1);
-  //HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
+	/* DMA2_Channel4_3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 	
   
 	//Format SD File SYSPara
@@ -974,7 +974,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 void ConfigSDMMC()
 {
-  SDHandle_SDMMC.Instance = SDMMC2;
+  SDHandle_SDMMC.Instance = SDMMC1;
 	SDHandle_SDMMC.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
   SDHandle_SDMMC.Init.ClockBypass = SDMMC_CLOCK_BYPASS_DISABLE;
 	//SDHandle_SDMMC.Init.ClockBypass = SDMMC_CLOCK_BYPASS_ENABLE;
@@ -997,11 +997,11 @@ void ConfigSDMMC()
 void ConfigHDMA()
 {
 	//hdma_sdmmc.Instance = DMA2_Stream6;
-  //hdma_sdmmc.Instance = DMA2_Stream3;
-	//hdma_sdmmc.Init.Channel = DMA_CHANNEL_4;
+  hdma_sdmmc.Instance = DMA2_Stream3;
+	hdma_sdmmc.Init.Channel = DMA_CHANNEL_4;
 	
-	hdma_sdmmc.Instance = DMA2_Stream5;
-	hdma_sdmmc.Init.Channel = DMA_CHANNEL_11;
+	//hdma_sdmmc.Instance = DMA2_Stream5;
+	//hdma_sdmmc.Init.Channel = DMA_CHANNEL_11;
 	
 	//DMA read process DMA_PERIPH_TO_MEMORY
 	//hdma_sdmmc.Init.Direction = DMA_PERIPH_TO_MEMORY;

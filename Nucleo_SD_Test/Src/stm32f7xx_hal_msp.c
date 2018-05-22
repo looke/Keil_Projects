@@ -124,23 +124,23 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
 	GPIO_InitTypeDef GPIO_InitStruct;
 	
 	/* SDMMC1 Peripheral clock enable */
-	//SD1_CLK_ENABLE();
+	SD1_CLK_ENABLE();
 	/* SDMMC2 Peripheral clock enable */
-  SD2_CLK_ENABLE();
+  //SD2_CLK_ENABLE();
 	
 	/* DMA controller clock enable */
   __HAL_RCC_DMA2_CLK_ENABLE();
 	
 	/* SDMMC1 port clock enable */
-	//SDMMC1_GEN_GPIO_PORT();
-	//SDMMC1_CMD_GPIO_PORT();
+	SDMMC1_GEN_GPIO_PORT();
+	SDMMC1_CMD_GPIO_PORT();
 	
 	/* SDMMC2 port clock enable */
-  SDMMC2_GEN_GPIO_D0_D4_PORT();
-	SDMMC2_CMD_GPIO_PORT();
+  //SDMMC2_GEN_GPIO_D0_D4_PORT();
+	//SDMMC2_CMD_GPIO_PORT();
 	
 	// Configure SDMMC1 port in Alternate function, push-pull and 100MHz speed
-	/*
+	
 	GPIO_InitStruct.Pin = SDMMC1_D0 | SDMMC1_D1 | SDMMC1_D2 | SDMMC1_D3 | SDMMC1_CK;
 	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
@@ -153,10 +153,11 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
 	GPIO_InitStruct.Alternate = GPIO_AF_SDMMC1;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
-	HAL_NVIC_SetPriority(SDMMC1_IRQn, 4, 0);
+	HAL_NVIC_SetPriority(SDMMC1_IRQn, 0, 1);
 	HAL_NVIC_EnableIRQ(SDMMC1_IRQn);
-	*/
 	
+	
+	/*
 	// Configure SDMMC2 port in Alternate function, push-pull and 100MHz speed
 	
 	GPIO_InitStruct.Pin = SDMMC2_D0 | SDMMC2_D1 | SDMMC2_D2 | SDMMC2_D3;
@@ -173,6 +174,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
 
 	HAL_NVIC_SetPriority(SDMMC2_IRQn, 0, 1);
 	HAL_NVIC_EnableIRQ(SDMMC2_IRQn);
+	*/
 	
 }
 
