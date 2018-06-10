@@ -51,7 +51,7 @@
           <OutputName>CarAcc</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Listings\</ListingPath>
@@ -546,6 +546,11 @@
               <FileName>stm32f7xx_ll_sdmmc.c</FileName>
               <FileType>1</FileType>
               <FilePath>D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_ll_sdmmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f7xx_ll_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>D:\DevelopProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_ll_exti.c</FilePath>
             </File>
           </Files>
         </Group>
