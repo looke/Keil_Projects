@@ -143,7 +143,9 @@
 #define SPIx_CS_GPIO_PORT                GPIOD
 #define SPIx_CS_AF                       GPIO_AF5_SPI1
 
-
+#define MAIN_STATUS_STOP                 0
+#define MAIN_STATUS_START                1
+#define MAIN_STATUS_ERROR                2
 /* Exported functions ------------------------------------------------------- */
 
 #endif /* __MAIN_H */
