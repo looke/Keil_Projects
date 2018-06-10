@@ -60,6 +60,9 @@ extern TIM_HandleTypeDef    TimHandle_ARHS;
 extern SD_HandleTypeDef    SDHandle_SDMMC;
 extern DMA_HandleTypeDef   hdma_sdmmc;
 
+extern LOOKE_SD_Global_Data_Cache SD_File_Cache;
+extern uint8_t MAIN_STATUS;
+
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -245,6 +248,45 @@ void DMA2_Stream3_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(&hdma_sdmmc);
 }
+
+
+void EXTI15_10_IRQHandler(void)  
+{  
+	HAL_GPIO_EXTI_IRQHandler(USER_BUTTON_PIN);
+	
+	
+	/*
+  //Switch MAIN_STATUS after USER_BUTTON Pressed
+	if(MAIN_STATUS == MAIN_STATUS_STOP)
+	{
+		//Start ARHS Timer and Input Capture Timer
+		if (HAL_TIM_Base_Start_IT(&TimHandle_ARHS) == HAL_OK && HAL_TIM_IC_Start_IT(&TimHandle_32bits,TIM_CHANNEL_1) == HAL_OK)
+    {
+			MAIN_STATUS = MAIN_STATUS_START;
+		  SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
+    }
+		else
+		{
+		  HAL_TIM_Base_Stop_IT(&TimHandle_ARHS);
+			HAL_TIM_IC_Stop_IT(&TimHandle_32bits,TIM_CHANNEL_1);
+		}
+	}
+	else if(MAIN_STATUS == MAIN_STATUS_START) //Stop the timer / Switch cache buffer state
+  {
+		if(HAL_TIM_Base_Stop_IT(&TimHandle_ARHS) == HAL_OK && HAL_TIM_IC_Stop_IT(&TimHandle_32bits,TIM_CHANNEL_1) == HAL_OK)
+		{
+			MAIN_STATUS = MAIN_STATUS_STOP;
+		  SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_STOP;
+		  SD_File_Cache.ARHS_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
+		  SD_File_Cache.TimeBase_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
+		}
+		else
+		{
+		  MAIN_STATUS = MAIN_STATUS_ERROR;
+		}
+	}
+	*/
+}  
 
 /**
   * @}

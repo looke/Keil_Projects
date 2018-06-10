@@ -52,9 +52,8 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+uint8_t MAIN_STATUS;
 /* TIM handle declaration */
-//TIM_HandleTypeDef    TimHandle_Master;
-//TIM_HandleTypeDef    TimHandle_Slave;
 
 TIM_HandleTypeDef    TimHandle_32bits;
 TIM_HandleTypeDef    TimHandle_ARHS;
@@ -72,45 +71,18 @@ HAL_SD_CardStatusTypedef SDCardStatus;
 
 HAL_SD_StateTypeDef SDState;
 
-//TIM_MasterConfigTypeDef TimMasterConfig;
-//TIM_SlaveConfigTypeDef  TimSlaveConfig;
-
-//TIM_IC_InitTypeDef   TimsConfig;
-
-//GPIO_InitTypeDef   GPIO_InitStruct;
-
 DMA_HandleTypeDef hdma_sdmmc;
 
 TIM_IC_InitTypeDef TimsConfig;
 
-//uint32_t uwIC1Value1_Master = 0;
-//uint32_t uwIC1Value2_Master = 0;
-//uint32_t uwDiffCapture_Master = 0;
-
-//uint32_t uwIC1Value1_Slave = 0;
-//uint32_t uwIC1Value2_Slave = 0;
-//uint32_t uwDiffCapture_Slave = 0;
-
-//uint32_t uwIC1Value1_32bits = 0;
-//uint32_t uwIC1Value2_32bits = 0;
-//uint32_t uwDiffCapture_32bits = 0;
-
-//uint32_t counter_cap = 0;
-
 uint32_t errorstate;
-
-//uint32_t testArray_Period[TEST_LIMIT];
-//int testArray_Period_Diff[TEST_LIMIT];
-
-
-
 __align(4) uint8_t align[16];
-//__align(4) uint8_t aBuffer_Block_Rx[LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE];
-//__align(4) uint8_t aBuffer_Block_Tx[BLOCK_SIZE*CACHE_SIZE];
 
 __align(4) LOOKE_SD_FileSys_Para_Union SD_FileSysParaUnion;
 __align(4) LOOKE_SD_Global_Data_Cache SD_File_Cache;
 
+LOOKE_SD_TimeBase_Data timeBaseDataTest;
+LOOKE_SD_ARHS_Data arhsDataTest;
 
 //__align(4) LOOKE_SD_ARHS_Data_Cache ARHS_cache;
 //__align(4) LOOKE_SD_TimeBase_Data_Cache TimeBase_cache;
@@ -121,8 +93,8 @@ __align(4) LOOKE_SD_Global_Data_Cache SD_File_Cache;
 //LOOKE_SD_ARHS_Data_Block AHRSDataBlock;
 
 //__align(4) uint8_t aBuffer_Block_Tx_Write[LOOKE_SD_FILE_BLOCK_SIZE];
-__align(4) uint8_t aBuffer_Block_Rx[LOOKE_SD_FILE_BLOCK_SIZE];
-__align(4) uint8_t aBuffer_Block_Tx[LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE];
+//__align(4) uint8_t aBuffer_Block_Rx[LOOKE_SD_FILE_BLOCK_SIZE];
+//__align(4) uint8_t aBuffer_Block_Tx[LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE];
 /* Prescaler declaration */
 __IO uint32_t uwPrescalerValue = 0;
 
@@ -135,7 +107,6 @@ uint32_t autoReloadValue;
 
 uint32_t sizeTest;
 
-LOOKE_SD_TimeBase_Data timeBaseDataTest;
 
 uint8_t i;
 
@@ -159,7 +130,7 @@ uint32_t waitErrorCounter;
 uint32_t missOutCounter;
 uint32_t EraseError;
 
-uint8_t GLOBAL_SDTRANSFER_SWITCH;
+//uint8_t GLOBAL_SDTRANSFER_SWITCH;
 uint8_t DMAERROR_SDTRANSFER;
 
 uint32_t errorBlockIndex[ERROR_BLOCKINDEX_LIMIT];
@@ -260,7 +231,7 @@ int main(void)
 	missOutCounter = 0;
 	EraseError = 0;
 	
-	GLOBAL_SDTRANSFER_SWITCH = 0;
+	//GLOBAL_SDTRANSFER_SWITCH = 0;
 	DMAERROR_SDTRANSFER = 0;
 	
   /* Configure the system clock to 216 MHz */
@@ -271,11 +242,71 @@ int main(void)
 	BSP_LED_Init(LED2);
   BSP_LED_Init(LED3);
 
+  /* Configure User push-button button */
+  BSP_PB_Init(BUTTON_USER,BUTTON_MODE_EXTI);
+
+  /* Wait for User push-button press before starting the Communication */
+  //while (BSP_PB_GetState(BUTTON_USER) != GPIO_PIN_SET)
+  //{
+  //  BSP_LED_Toggle(LED1);
+  //  HAL_Delay(100);
+  //}
+  //BSP_LED_Off(LED1);
+	
+  /*##-1- Configure the SPI peripheral #######################################*/
+  /* Set the SPI parameters */
+  SpiHandle.Instance               = SPIx;
+  SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+  SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
+  SpiHandle.Init.CLKPhase          = SPI_PHASE_1EDGE;
+  SpiHandle.Init.CLKPolarity       = SPI_POLARITY_LOW;
+  SpiHandle.Init.DataSize          = SPI_DATASIZE_8BIT;
+  SpiHandle.Init.FirstBit          = SPI_FIRSTBIT_MSB;
+  SpiHandle.Init.TIMode            = SPI_TIMODE_DISABLE;
+  SpiHandle.Init.CRCCalculation    = SPI_CRCCALCULATION_DISABLE;
+  SpiHandle.Init.CRCPolynomial     = 7;
+  SpiHandle.Init.NSS               = SPI_NSS_SOFT;
+	SpiHandle.Init.Mode = SPI_MODE_MASTER;
+	
+	if(HAL_SPI_Init(&SpiHandle) != HAL_OK)
+  {
+    /* Initialization Error */
+    Error_Handler();
+  }
+	
+	DelaySomeTime();
+	
+	cmd_readWhoIam = MPU9250_SPI_READ_MASK | MPU9250_REG_WHO_AM_I;
+	
+  	
+	SPI_CS_Active();
+  deviceID = SPI_MPU9250_ReadByte(&SpiHandle,cmd_readWhoIam);
+	SPI_CS_Deactive();
+	
+	DelayShortTime();
+	
+	SPI_CS_Active();
+	deviceID = SPI_MPU9250_ReadByte(&SpiHandle,MPU9250_SPI_READ_MASK | MPU9250_REG_PWR_MGMT_1);
+	SPI_CS_Deactive();
+	
+	DelayShortTime();
+	
+	SPI_CS_Active();
+	deviceID = SPI_MPU9250_ReadByte(&SpiHandle,MPU9250_SPI_READ_MASK | MPU9250_REG_PWR_MGMT_2);
+	SPI_CS_Deactive();
+	
+	DelayShortTime();
+	SPI_MPU9250_Init();
+	
+	//Setup Main Status
+	MAIN_STATUS = MAIN_STATUS_STOP;
 	//Setup Global Cache
-	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
+	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_STOP;
   SD_File_Cache.TimeBase_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NOT_FULL;
   SD_File_Cache.TimeBase_Cache.CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_MASTER;
-
+  SD_File_Cache.ARHS_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NOT_FULL;
+  SD_File_Cache.ARHS_Cache.CurrentDataBuffer = LOOKE_SD_FILE_BUFFER_MASTER;
+	
   /*
 	TimHandle_32bits.Instance = TIMx_32bits;
 	//TimHandle_32bits.Init.Period            = 0xFFFFFFFF;
@@ -312,8 +343,8 @@ int main(void)
 	TimHandle_ARHS.Instance = TIMx_ARHS;
 	//TimHandle_ARHS.Init.Period            = 9999; // 1 SPS / 1000ms Period
 	//TimHandle_ARHS.Init.Period            = 4999; // 2 SPS / 500ms Period
-	//TimHandle_ARHS.Init.Period            = 1999; // 5 SPS / 200ms Period
-	TimHandle_ARHS.Init.Period            = 999; // 10 SPS / 100ms Period
+	TimHandle_ARHS.Init.Period            = 1999; // 5 SPS / 200ms Period
+	//TimHandle_ARHS.Init.Period            = 999; // 10 SPS / 100ms Period
 	
 	//TimHandle_ARHS.Init.Prescaler         = 26;	// 108Mhz/27 = 4Mhz
 	//TimHandle_ARHS.Init.Prescaler         = 2;	// 108Mhz/3 = 36Mhz
@@ -495,12 +526,14 @@ int main(void)
 	//}	
 	
 	
+	/*
 	uint16_t initForBuffer;
 	for(initForBuffer = 0 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE; initForBuffer++)
 	{
 		aBuffer_Block_Tx[initForBuffer] = initForBuffer;
 		//aBuffer_Block_Tx[initForBuffer] = 0;
 	}
+	*/
 	
 	//uint8_t testValue = 0x01;
 	//for(initForBuffer = 4 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE; )
@@ -612,6 +645,7 @@ int main(void)
     Error_Handler();
   }
 	
+	
 	//Start Time Base
 	if (HAL_TIM_Base_Start_IT(&TimHandle_32bits) != HAL_OK)
   {
@@ -620,7 +654,7 @@ int main(void)
   }
 	*/
 	
-	/*
+	
 	//Set Timer for test case
 	if (HAL_TIM_Base_Init(&TimHandle_ARHS) != HAL_OK)
   {
@@ -628,6 +662,7 @@ int main(void)
     Error_Handler();
   }
 	
+	/*
 	//Start Time Base
 	if (HAL_TIM_Base_Start_IT(&TimHandle_ARHS) != HAL_OK)
   {
@@ -636,22 +671,26 @@ int main(void)
   }
 	*/
 	
+	
 	if (HAL_TIM_IC_Init(&TimHandle_32bits) != HAL_OK)
   {
-    /* Initialization Error */
+    // Initialization Error
     Error_Handler();
   }
+	
 	if(HAL_TIM_IC_ConfigChannel(&TimHandle_32bits, &TimsConfig, TIM_CHANNEL_1) != HAL_OK)
   {
-		/* Initialization Error */
+		// Initialization Error
     Error_Handler();
   }
+	
+	/*
 	if (HAL_TIM_IC_Start_IT(&TimHandle_32bits,TIM_CHANNEL_1) != HAL_OK)
   {
-    /* Starting Error */
+    // Starting Error
     Error_Handler();
   }
-
+  */
 	
   while (1)
   {
@@ -757,20 +796,35 @@ int main(void)
 		*/
 		//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 		
-		if(GLOBAL_SDTRANSFER_SWITCH > 0)
+		if(MAIN_STATUS == MAIN_STATUS_START)
 		{
-			GLOBAL_SDTRANSFER_SWITCH = 0;
 			whileInSDCounter++;
 			
+		  //Check Cache Globle State and Buffer State. Start Sync Process if Need;
+		  if(SD_File_Cache.TimeBase_Cache.CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC && SD_File_Cache.CurrentGlobalState == LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER)
+		  {
+			  //Sync Process
+		    LOOKE_SD_FILE_SYNC_TRANSFER_RESULT syncResult = LOOKE_SD_File_SyncCacheToSDCard_TimeBase(&SDHandle_SDMMC, &SD_FileSysParaUnion.FileSysPara, &SD_File_Cache);
+		    break;
+			}
 			
+		  //Check Cache Globle State and Buffer State. Start Sync Process if Need;
+		  if(SD_File_Cache.ARHS_Cache.CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC && SD_File_Cache.CurrentGlobalState == LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER)
+		  {
+			  //Sync Process
+		    LOOKE_SD_FILE_SYNC_TRANSFER_RESULT syncResult = LOOKE_SD_File_SyncCacheToSDCard_ARHS(&SDHandle_SDMMC, &SD_FileSysParaUnion.FileSysPara, &SD_File_Cache);
+		    break;
+			}
+			
+			/*
 		  //startTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
 			
 			if(HAL_SD_GetCardState(&SDHandle_SDMMC) == HAL_SD_CARD_TRANSFER)
 		  {
-		    if( HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, startBlockIndex, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK )
-	      {
-	        DMASendErrorCounter++;
-	      }
+		    //if( HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, startBlockIndex, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK )
+	      //{
+	      //  DMASendErrorCounter++;
+	      //}
 		  }
 		  else
 		  {
@@ -778,6 +832,26 @@ int main(void)
 		  }
 			
 			//endTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
+			*/
+		}
+		
+		if(MAIN_STATUS == MAIN_STATUS_STOP)
+		{
+			//Check Cache Globle State. Start final step Sync Process if Need;
+		  if(SD_File_Cache.TimeBase_Cache.CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC)
+		  {
+			  //Sync Process
+		    LOOKE_SD_FILE_SYNC_TRANSFER_RESULT syncResult = LOOKE_SD_File_SyncCacheToSDCard_TimeBase(&SDHandle_SDMMC, &SD_FileSysParaUnion.FileSysPara, &SD_File_Cache);
+		    break;
+			}
+			
+		  //Check Cache Globle State and Buffer State. Start Sync Process if Need;
+		  if(SD_File_Cache.ARHS_Cache.CacheBufferState == LOOKE_SD_FILE_BUFFER_NEED_SYNC)
+		  {
+			  //Sync Process
+		    LOOKE_SD_FILE_SYNC_TRANSFER_RESULT syncResult = LOOKE_SD_File_SyncCacheToSDCard_ARHS(&SDHandle_SDMMC, &SD_FileSysParaUnion.FileSysPara, &SD_File_Cache);
+		    break;
+			}
 			
 		}
   }
@@ -970,7 +1044,7 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 	SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
 	*/
 	
-	
+	/*
   uint16_t waitCounter = 0x0000;
 	while (waitCounter < 0xFFFF)
 	{
@@ -984,6 +1058,7 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 		DelayShortTime();
 	}
 	waitErrorCounter++;
+	*/
 }
 
 /**
@@ -1026,10 +1101,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	*/
 	
 	//Set DMA Write OP Switch
-	GLOBAL_SDTRANSFER_SWITCH = 1;
+	//GLOBAL_SDTRANSFER_SWITCH = 1;
 	//BSP_LED_Toggle(LED2);
-	timerCounter++;
-	whileCounter = 0;
+	//timerCounter++;
+	//whileCounter = 0;
 	//SCB_CleanDCache();
 	//uint16_t waitCounter = 0x0000;
 	//while (waitCounter < 0xFFFF)
@@ -1042,6 +1117,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	//	waitCounter4SDMMC = waitCounter;
 	//}
 	//waitErrorCounter++;
+	
+	SPI_MPU9250_ReadAcc();
+	
+	arhsDataTest.ACC_X = acc_x;
+	arhsDataTest.ACC_Y = acc_y;
+	arhsDataTest.ACC_Z = acc_z;
+	
+	//LOOKE_SD_File_AddARHSMeasureToCache(&SD_File_Cache ,&arhsDataTest);
+	
 }
 
 /**
@@ -1063,7 +1147,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 	  timeBaseDataTest.DataIndex = captureNumber;
 	  timeBaseDataTest.TimeStamp = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);;
 	
-	  LOOKE_SD_File_AddTimeBaseMeasureToCache(&SD_File_Cache,&timeBaseDataTest);
+	  //LOOKE_SD_File_AddTimeBaseMeasureToCache(&SD_File_Cache,&timeBaseDataTest);
 	}
 	
 	
@@ -1171,6 +1255,8 @@ uint8_t SPI_MPU9250_Init()
 	test = SPI_MPU9250_ReadByte(&SpiHandle, MPU9250_SPI_READ_MASK|MPU9250_REG_PWR_MGMT_1); 
 	SPI_CS_Deactive();
 	
+	DelayShortTime();
+	
 	//Enable Acc&Gyro
 	SPI_CS_Active();
   SPI_MPU9250_SendByte(&SpiHandle, MPU9250_REG_PWR_MGMT_2, 0x00); 
@@ -1179,7 +1265,8 @@ uint8_t SPI_MPU9250_Init()
 	SPI_CS_Active();
 	test = SPI_MPU9250_ReadByte(&SpiHandle, MPU9250_SPI_READ_MASK|MPU9250_REG_PWR_MGMT_2); 
 	SPI_CS_Deactive();
-
+  DelayShortTime();
+		
   //Bandwidth 250Hz/Sample Rate;1kHz if F_choice_b=00
   SPI_CS_Active();
   SPI_MPU9250_SendByte(&SpiHandle, MPU9250_REG_CONFIG, 0x00);
@@ -1188,6 +1275,7 @@ uint8_t SPI_MPU9250_Init()
 	SPI_CS_Active();
 	test = SPI_MPU9250_ReadByte(&SpiHandle, MPU9250_SPI_READ_MASK|MPU9250_REG_CONFIG);
 	SPI_CS_Deactive();
+	DelayShortTime();
 	
   // Set sample rate = gyroscope output rate/(1 + SMPLRT_DIV) if F_choice_b=00
 	SPI_CS_Active();
@@ -1197,7 +1285,8 @@ uint8_t SPI_MPU9250_Init()
 	SPI_CS_Active();
 	test = SPI_MPU9250_ReadByte(&SpiHandle, MPU9250_SPI_READ_MASK|MPU9250_REG_SMPLRT_DIV);
 	SPI_CS_Deactive();
-
+	DelayShortTime();
+	
   //Gyro Full Scale:250dps{0x00}/F_choice_b:11
 	SPI_CS_Active();
   SPI_MPU9250_SendByte(&SpiHandle, MPU9250_REG_GYRO_CONFIG, 0x03);
@@ -1206,7 +1295,8 @@ uint8_t SPI_MPU9250_Init()
 	SPI_CS_Active();
 	test = SPI_MPU9250_ReadByte(&SpiHandle, MPU9250_SPI_READ_MASK|MPU9250_REG_GYRO_CONFIG);
 	SPI_CS_Deactive();
-
+	DelayShortTime();
+	
 	 //XYZ SelfTest OFF/ Full Scale:2g{0x00}
 	SPI_CS_Active();
   SPI_MPU9250_SendByte(&SpiHandle,MPU9250_REG_ACCEL_CONFIG, 0x00);
@@ -1215,6 +1305,7 @@ uint8_t SPI_MPU9250_Init()
 	SPI_CS_Active();
   test = SPI_MPU9250_ReadByte(&SpiHandle, MPU9250_SPI_READ_MASK|MPU9250_REG_ACCEL_CONFIG);
 	SPI_CS_Deactive();
+	DelayShortTime();
 	
 	//DLPF 99hz / 3DB 1Khz F_choice_b:0
 	SPI_CS_Active();
@@ -1283,6 +1374,38 @@ void SPI_MPU9250_ReadAcc(void)
 	*/
 }
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  //Switch MAIN_STATUS after USER_BUTTON Pressed
+	if(MAIN_STATUS == MAIN_STATUS_STOP)
+	{
+		//Start ARHS Timer and Input Capture Timer
+		if (HAL_TIM_Base_Start_IT(&TimHandle_ARHS) == HAL_OK && HAL_TIM_IC_Start_IT(&TimHandle_32bits,TIM_CHANNEL_1) == HAL_OK)
+    {
+			MAIN_STATUS = MAIN_STATUS_START;
+		  SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_TRANSFER;
+    }
+		else
+		{
+		  HAL_TIM_Base_Stop_IT(&TimHandle_ARHS);
+			HAL_TIM_IC_Stop_IT(&TimHandle_32bits,TIM_CHANNEL_1);
+		}
+	}
+	else if(MAIN_STATUS == MAIN_STATUS_START) //Stop the timer / Switch cache buffer state
+  {
+		if(HAL_TIM_Base_Stop_IT(&TimHandle_ARHS) == HAL_OK && HAL_TIM_IC_Stop_IT(&TimHandle_32bits,TIM_CHANNEL_1) == HAL_OK)
+		{
+			MAIN_STATUS = MAIN_STATUS_STOP;
+		  SD_File_Cache.CurrentGlobalState = LOOKE_SD_FILE_GLOBAL_CACHE_STATE_STOP;
+		  SD_File_Cache.ARHS_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
+		  SD_File_Cache.TimeBase_Cache.CacheBufferState = LOOKE_SD_FILE_BUFFER_NEED_SYNC;
+		}
+		else
+		{
+		  MAIN_STATUS = MAIN_STATUS_ERROR;
+		}
+	}
+}
 #ifdef  USE_FULL_ASSERT
 
 /**
