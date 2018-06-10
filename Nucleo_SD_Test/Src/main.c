@@ -164,12 +164,15 @@ static void Error_Handler(void);
 static void CPU_CACHE_Enable(void);
 void LOOKE_SD_DMA_XferError(DMA_HandleTypeDef *hdma);
 
+void InitTXBuffer(void);
+
 /* Private functions ---------------------------------------------------------*/
 void DelaySomeTime(void);
 void DelayShortTime(void);
 
 void ConfigSDMMC(void);
 void ConfigHDMA(void);
+
 /**
   * @brief  Main program
   * @param  None
@@ -439,13 +442,16 @@ int main(void)
 	//  SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
 	//}	
 	
+	InitTXBuffer();
 	
+	/*
 	uint16_t initForBuffer;
 	for(initForBuffer = 0 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE; initForBuffer++)
 	{
 		aBuffer_Block_Tx[initForBuffer] = initForBuffer;
 		//aBuffer_Block_Tx[initForBuffer] = 0;
 	}
+	*/
 	
 	//uint8_t testValue = 0x01;
 	//for(initForBuffer = 4 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE; )
@@ -462,9 +468,9 @@ int main(void)
 	//aBuffer_Block_Tx[511] = 0x00;
 	
 	SCB_CleanDCache();
-	/*
-	//startTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
 	
+	//startTimeStamp = __HAL_TIM_GET_COUNTER(&TimHandle_32bits);
+	/*
 	if(HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, 0x10, LOOKE_SD_FILE_CACHE_SIZE) == HAL_OK)
 	{
 	  //SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
@@ -473,9 +479,9 @@ int main(void)
 		DelaySomeTime();
 		//DelaySomeTime();
 	}
-  
+  */
 	//SDCardState = HAL_SD_GetCardState(&SDHandle_SDMMC);
-	*/
+	
 	
 	//LOOKE_SD_TimeBase_Data_Buffer_TEST_Union testUnion;
 	//for(i=0; i<TIMEBASE_BLOCK_DATA_SIZE; i++)
@@ -570,14 +576,14 @@ int main(void)
 	if (HAL_TIM_Base_Init(&TimHandle_ARHS) != HAL_OK)
   {
     //Initialization Error
-    Error_Handler();
+    //Error_Handler();
   }
 	
 	//Start Time Base
 	if (HAL_TIM_Base_Start_IT(&TimHandle_ARHS) != HAL_OK)
   {
     //Initialization Error
-    Error_Handler();
+    //Error_Handler();
   }
 	
 	
@@ -695,6 +701,7 @@ int main(void)
 			
 			if(HAL_SD_GetCardState(&SDHandle_SDMMC) == HAL_SD_CARD_TRANSFER)
 		  {
+				SCB_CleanDCache();
 		    if( HAL_SD_WriteBlocks_DMA(&SDHandle_SDMMC, aBuffer_Block_Tx, startBlockIndex, LOOKE_SD_FILE_CACHE_SIZE) != HAL_OK )
 	      {
 	        DMASendErrorCounter++;
@@ -953,11 +960,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	
 	*/
 	
-	//Set DMA Write OP Switch
-	GLOBAL_SDTRANSFER_SWITCH = 1;
-	//BSP_LED_Toggle(LED2);
-	timerCounter++;
-	whileCounter = 0;
+	if(timerCounter < WRITE_TEST_MAX_NUM)
+	{
+		//Set DMA Write OP Switch
+	  GLOBAL_SDTRANSFER_SWITCH = 1;
+	  //BSP_LED_Toggle(LED2);
+	  timerCounter++;
+	  whileCounter = 0;
+	}
+
 	//SCB_CleanDCache();
 	//uint16_t waitCounter = 0x0000;
 	//while (waitCounter < 0xFFFF)
@@ -1025,6 +1036,16 @@ void ConfigHDMA()
 	hdma_sdmmc.Init.PeriphBurst = DMA_PBURST_INC4;
 	
 	//hdma_sdmmc.XferErrorCallback = LOOKE_SD_DMA_XferError;
+}
+
+void InitTXBuffer(void)
+{
+	uint16_t initForBuffer;
+	for(initForBuffer = 0 ; initForBuffer<LOOKE_SD_FILE_BLOCK_SIZE*LOOKE_SD_FILE_CACHE_SIZE; initForBuffer++)
+	{
+		aBuffer_Block_Tx[initForBuffer] = initForBuffer;
+		//aBuffer_Block_Tx[initForBuffer] = 0;
+	}
 }
 #ifdef  USE_FULL_ASSERT
 
