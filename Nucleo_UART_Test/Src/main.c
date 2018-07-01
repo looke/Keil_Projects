@@ -73,7 +73,7 @@ void SystemClock_Config(void);
 static void Error_Handler(void);
 static void CPU_CACHE_Enable(void);
 
-uint8_t testArray[10];
+uint8_t testArray[256];
 
 /**
   * @brief  Main program.
@@ -129,17 +129,19 @@ int main(void)
     /* Initialization Error */
     Error_Handler();
   }
-  uint8_t test = 0x2A;
+  //uint8_t test = 0x2A;
   /* Output a message on Hyperterminal using printf function */
   //printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
   //printf("** Test finished successfully. ** \n\r");
 	
-	for(uint8_t i = 0; i < 10; i++)
+	uint8_t content = 0;
+	for(uint16_t i = 0; i < 256; i++)
 	{
-	  testArray[i] = i*10;
+	  testArray[i] = content;
+		content++;
 	}
 	
-  HAL_UART_Transmit(&UartHandle, testArray, 5, 0xFFFF);
+  HAL_UART_Transmit(&UartHandle, testArray, 256, 0xFFFF);
 
 
 
